@@ -35,9 +35,9 @@ def test_generate_returns_script(mocker, tmp_path):
 
     mocker.patch("src.brain.script_generator.VOICE_GUIDE_PATH", str(voice_file))
 
-    mock_model = mocker.MagicMock()
-    mock_model.generate_content.return_value.text = _mock_script_json()
-    sg._model = mock_model
+    mock_client = mocker.MagicMock()
+    mock_client.models.generate_content.return_value.text = _mock_script_json()
+    sg._client = mock_client
 
     script = sg.generate(_make_article())
 
@@ -53,9 +53,9 @@ def test_generate_evergreen_returns_script(mocker, tmp_path):
 
     mocker.patch("src.brain.script_generator.VOICE_GUIDE_PATH", str(voice_file))
 
-    mock_model = mocker.MagicMock()
-    mock_model.generate_content.return_value.text = _mock_script_json()
-    sg._model = mock_model
+    mock_client = mocker.MagicMock()
+    mock_client.models.generate_content.return_value.text = _mock_script_json()
+    sg._client = mock_client
 
     script = sg.generate_evergreen()
 

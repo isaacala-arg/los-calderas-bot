@@ -31,11 +31,9 @@ def test_returns_top_articles(mocker):
         "urgency_reasoning": "Nada urgente hoy",
     })
 
-    mock_model = mocker.MagicMock()
-    mock_model.generate_content.return_value.text = gemini_response
-    mocker.patch("google.generativeai.GenerativeModel", return_value=mock_model)
-    mocker.patch("google.generativeai.configure")
-    ev._model = mock_model
+    mock_client = mocker.MagicMock()
+    mock_client.models.generate_content.return_value.text = gemini_response
+    ev._client = mock_client
 
     result = ev.evaluate(articles)
 
@@ -54,9 +52,9 @@ def test_returns_urgent_article_when_score_high(mocker):
         "urgency_reasoning": "Recall masivo afecta a dueños de Tesla en México",
     })
 
-    mock_model = mocker.MagicMock()
-    mock_model.generate_content.return_value.text = gemini_response
-    ev._model = mock_model
+    mock_client = mocker.MagicMock()
+    mock_client.models.generate_content.return_value.text = gemini_response
+    ev._client = mock_client
 
     result = ev.evaluate(articles)
 

@@ -1,11 +1,11 @@
 import json
 import os
 import random
-import google.generativeai as genai
 from datetime import datetime
+from google import genai
 from src.models import Article, Script
 
-_model = None
+_client = None
 
 VOICE_GUIDE_PATH = os.path.join(os.path.dirname(__file__), "../../style/los-calderas-voice.md")
 
@@ -44,13 +44,12 @@ _EVERGREEN_TOPICS = [
 ]
 
 
-def _get_model():
-    global _model
-    if _model is None:
+def _get_client():
+    global _client
+    if _client is None:
         from src.config import settings
-        genai.configure(api_key=settings.GEMINI_API_KEY)
-        _model = genai.GenerativeModel("gemini-2.0-flash")
-    return _model
+        _client = genai.Client(api_key=settings.GEMINI_API_KEY)
+    return _client
 
 
 def generate(article: Article, script_type: str = "trend") -> Script:
@@ -64,8 +63,11 @@ def generate(article: Article, script_type: str = "trend") -> Script:
         script_type=script_type,
     )
 
-    model = _get_model()
-    response = model.generate_content(prompt)
+    client = _get_client()
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=prompt,
+    )
     raw = response.text.strip()
     if raw.startswith("```"):
         raw = raw.split("```")[1]
@@ -76,6 +78,7 @@ def generate(article: Article, script_type: str = "trend") -> Script:
         data = json.loads(raw.strip())
     except json.JSONDecodeError as e:
         raise ValueError(f"Gemini returned non-JSON response: {raw[:200]}") from e
+
     return Script(
         title=data["title"],
         topic_context=data["topic_context"],

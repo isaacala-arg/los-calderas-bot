@@ -1,8 +1,8 @@
 import json
-import google.generativeai as genai
+from google import genai
 from src.models import EvaluationResult
 
-_model = None
+_client = None
 
 _PROMPT = """
 Eres el asistente de contenido para "Los Calderas", canal mexicano de autos (TikTok/Reels/Shorts).
@@ -25,13 +25,12 @@ Solo JSON, sin nada más.
 """
 
 
-def _get_model():
-    global _model
-    if _model is None:
+def _get_client():
+    global _client
+    if _client is None:
         from src.config import settings
-        genai.configure(api_key=settings.GEMINI_API_KEY)
-        _model = genai.GenerativeModel("gemini-2.0-flash")
-    return _model
+        _client = genai.Client(api_key=settings.GEMINI_API_KEY)
+    return _client
 
 
 def evaluate(articles: list) -> EvaluationResult:
@@ -46,8 +45,11 @@ def evaluate(articles: list) -> EvaluationResult:
         for i, a in enumerate(articles)
     )
 
-    model = _get_model()
-    response = model.generate_content(_PROMPT.format(articles_text=articles_text))
+    client = _get_client()
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=_PROMPT.format(articles_text=articles_text),
+    )
     raw = response.text.strip()
     if raw.startswith("```"):
         raw = raw.split("```")[1]
@@ -58,6 +60,7 @@ def evaluate(articles: list) -> EvaluationResult:
         data = json.loads(raw.strip())
     except json.JSONDecodeError as e:
         raise ValueError(f"Gemini returned non-JSON response: {raw[:200]}") from e
+
     top_articles = [articles[i] for i in data["top_3_indices"] if i < len(articles)]
     idx = data.get("urgency_index")
     urgent_article = articles[idx] if (idx is not None and idx < len(articles)) else None
