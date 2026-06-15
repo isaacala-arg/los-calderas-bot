@@ -11,8 +11,6 @@ def _patch_env(monkeypatch):
         "GMAIL_USER": "test@gmail.com",
         "GMAIL_APP_PASSWORD": "test-app-password",
         "ALERT_EMAIL": "test@outlook.com",
-        "REDDIT_CLIENT_ID": "test-client-id",
-        "REDDIT_CLIENT_SECRET": "test-client-secret",
     }
     for key, val in env.items():
         monkeypatch.setenv(key, val)

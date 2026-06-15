@@ -2,7 +2,19 @@ from unittest.mock import MagicMock
 from src.sources.reddit_fetcher import fetch_posts
 
 
-def test_returns_high_score_posts(mocker):
+def test_returns_empty_when_no_credentials():
+    articles = fetch_posts(limit=5)
+    assert articles == []
+
+
+def test_returns_high_score_posts(monkeypatch, mocker):
+    monkeypatch.setenv("REDDIT_CLIENT_ID", "test-client-id")
+    monkeypatch.setenv("REDDIT_CLIENT_SECRET", "test-client-secret")
+
+    import importlib
+    from src.config import settings as s
+    importlib.reload(s)
+
     mock_post = MagicMock()
     mock_post.title = "FSD now available in Mexico"
     mock_post.permalink = "/r/teslamotors/comments/abc123"

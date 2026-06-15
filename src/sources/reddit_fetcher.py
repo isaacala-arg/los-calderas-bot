@@ -8,6 +8,9 @@ SUBREDDITS = ["cars", "teslamotors", "electricvehicles", "Autos", "CarTalk"]
 def fetch_posts(limit: int = 10) -> list:
     from src.config import settings
 
+    if not settings.REDDIT_CLIENT_ID or not settings.REDDIT_CLIENT_SECRET:
+        return []
+
     reddit = praw.Reddit(
         client_id=settings.REDDIT_CLIENT_ID,
         client_secret=settings.REDDIT_CLIENT_SECRET,
