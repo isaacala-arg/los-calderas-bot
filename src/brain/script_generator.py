@@ -72,7 +72,10 @@ def generate(article: Article, script_type: str = "trend") -> Script:
         if raw.startswith("json"):
             raw = raw[4:]
 
-    data = json.loads(raw.strip())
+    try:
+        data = json.loads(raw.strip())
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Gemini returned non-JSON response: {raw[:200]}") from e
     return Script(
         title=data["title"],
         topic_context=data["topic_context"],
