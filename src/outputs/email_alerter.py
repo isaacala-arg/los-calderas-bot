@@ -6,6 +6,11 @@ from src.models import Article
 
 def send_alert(article: Article, urgency_score: float, reasoning: str) -> None:
     from src.config import settings
+
+    if not settings.GMAIL_USER or not settings.GMAIL_APP_PASSWORD or not settings.ALERT_EMAIL:
+        print(f"Email not configured — skipping alert for: {article.title}")
+        return
+
     msg = MIMEMultipart("alternative")
     msg["Subject"] = f"🚨 Alerta Los Calderas [{urgency_score}/10]: {article.title[:60]}"
     msg["From"] = settings.GMAIL_USER
