@@ -3,6 +3,8 @@ import os
 import random
 from datetime import datetime
 from google import genai
+from google.genai.errors import ServerError
+from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 from src.models import Article, Script
 
 _client = None
@@ -52,6 +54,16 @@ def _get_client():
     return _client
 
 
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_fixed(60),
+    retry=retry_if_exception_type(ServerError),
+    reraise=True,
+)
+def _call_gemini(client, model: str, contents: str):
+    return client.models.generate_content(model=model, contents=contents)
+
+
 def generate(article: Article, script_type: str = "trend") -> Script:
     with open(VOICE_GUIDE_PATH, "r", encoding="utf-8") as f:
         voice_guide = f.read()
@@ -64,10 +76,7 @@ def generate(article: Article, script_type: str = "trend") -> Script:
     )
 
     client = _get_client()
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
-    )
+    response = _call_gemini(client, "gemini-2.5-flash", prompt)
     raw = response.text.strip()
     if raw.startswith("```"):
         raw = raw.split("```")[1]

@@ -1,5 +1,7 @@
 import json
 from google import genai
+from google.genai.errors import ServerError
+from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 from src.models import EvaluationResult
 
 _client = None
@@ -33,6 +35,16 @@ def _get_client():
     return _client
 
 
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_fixed(60),
+    retry=retry_if_exception_type(ServerError),
+    reraise=True,
+)
+def _call_gemini(client, model: str, contents: str):
+    return client.models.generate_content(model=model, contents=contents)
+
+
 def evaluate(articles: list) -> EvaluationResult:
     if not articles:
         return EvaluationResult(
@@ -46,9 +58,8 @@ def evaluate(articles: list) -> EvaluationResult:
     )
 
     client = _get_client()
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=_PROMPT.format(articles_text=articles_text),
+    response = _call_gemini(
+        client, "gemini-2.5-flash", _PROMPT.format(articles_text=articles_text)
     )
     raw = response.text.strip()
     if raw.startswith("```"):

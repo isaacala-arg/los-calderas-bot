@@ -4,18 +4,31 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from google import genai
+from google.genai.errors import ServerError
+from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 from src.brain.script_generator import generate
 from src.outputs.notion_writer import write_script
 from src.models import Article
 from datetime import datetime
 
 
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_fixed(60),
+    retry=retry_if_exception_type(ServerError),
+    reraise=True,
+)
+def _call_gemini(client, model: str, contents: str):
+    return client.models.generate_content(model=model, contents=contents)
+
+
 def research_topic(topic: str) -> Article:
     from src.config import settings
     client = genai.Client(api_key=settings.GEMINI_API_KEY)
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=f"""Investiga este tema para el canal automotriz mexicano "Los Calderas":
+    response = _call_gemini(
+        client,
+        "gemini-2.5-flash",
+        f"""Investiga este tema para el canal automotriz mexicano "Los Calderas":
 
 TEMA: {topic}
 
