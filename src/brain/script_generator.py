@@ -22,7 +22,11 @@ _TREND_PROMPT = """{voice_guide}
 
 ---
 
-Genera un guión de NOTICIAS/TENDENCIAS para Los Calderas. Video de 60-90 segundos.
+Genera un guión de NOTICIAS/TENDENCIAS para Los Calderas.
+
+DURACIÓN OBJETIVO: 60 a 90 segundos en total (hook + cuerpo + CTA).
+A ritmo normal de habla, 150 palabras ≈ 1 minuto. El cuerpo (campo "body") debe tener entre 120 y 200 palabras.
+Si el cuerpo tiene menos de 100 palabras, está incompleto — desarrolla más el tema.
 
 TEMA: {title}
 CONTEXTO (verifica con búsqueda si puedes complementar con datos más recientes): {context}
@@ -70,7 +74,7 @@ Responde SOLO con JSON (sin markdown, sin ```):
   "title": "título corto para Notion (máx 60 caracteres)",
   "topic_context": "por qué es relevante ahora, 1-2 oraciones con dato específico",
   "hook": "el gancho exacto — texto visual O frase hablada, máximo 12 palabras",
-  "body": "guión completo del cuerpo (40-75 segundos hablados), con datos reales y humor específico",
+  "body": "guión completo del cuerpo — mínimo 120 palabras, máximo 200. Con datos reales y humor específico mexicano.",
   "cta": "cierre que genere saves o que alguien mande a alguien específico",
   "visual_idea": "setup visual concreto que detenga el scroll antes de hablar",
   "filming_tips": ["tip 1 concreto para este video", "tip 2", "tip 3 opcional"],
@@ -88,7 +92,11 @@ _HOWTO_PROMPT = """{voice_guide}
 
 ---
 
-Genera un guión tipo HOW-TO / DATOS REALES para Los Calderas. Video de 60-90 segundos.
+Genera un guión tipo HOW-TO / DATOS REALES para Los Calderas.
+
+DURACIÓN OBJETIVO: 60 a 90 segundos en total (hook + cuerpo + CTA).
+A ritmo normal de habla, 150 palabras ≈ 1 minuto. El cuerpo (campo "body") debe tener entre 120 y 200 palabras.
+Si el cuerpo tiene menos de 100 palabras, está incompleto — desarrolla el paso a paso con más detalle.
 
 TEMA: {title}
 CONTEXTO: {context}
@@ -132,7 +140,7 @@ Responde SOLO con JSON (sin markdown, sin ```):
   "title": "título corto para Notion (máx 60 caracteres)",
   "topic_context": "qué dato específico resuelve este video y por qué importa ahora",
   "hook": "el gancho exacto — revela el dato de entrada, máximo 12 palabras",
-  "body": "guión completo (40-75 segundos), paso a paso pero casual, con cifras exactas",
+  "body": "guión completo paso a paso — mínimo 120 palabras, máximo 200. Casual, con cifras exactas.",
   "cta": "cierre que genere saves porque es info útil",
   "visual_idea": "qué mostrar en pantalla mientras hablas (app, pantalla del carro, calculadora, etc.)",
   "filming_tips": ["tip 1 concreto para hacer visual el dato", "tip 2", "tip 3 opcional"],
@@ -150,7 +158,11 @@ _LIFESTYLE_PROMPT = """{voice_guide}
 
 ---
 
-Genera una IDEA DE CONTENIDO LIFESTYLE para Los Calderas. Video de 30-90 segundos.
+Genera una IDEA DE CONTENIDO LIFESTYLE para Los Calderas.
+
+DURACIÓN OBJETIVO: 30 a 90 segundos en total según el contenido.
+El plan de escenas (campo "body") debe cubrir suficiente material para al menos 45 segundos de video.
+Si solo tienes 2 escenas cortas, agrega una tercera o expande las existentes.
 
 TEMA: {title}
 CONTEXTO: {context}
@@ -206,7 +218,11 @@ _OPINION_PROMPT = """{voice_guide}
 
 ---
 
-Genera un guión de OPINIÓN / COMPARATIVA para Los Calderas. Video de 60-90 segundos.
+Genera un guión de OPINIÓN / COMPARATIVA para Los Calderas.
+
+DURACIÓN OBJETIVO: 60 a 90 segundos en total (hook + cuerpo + CTA).
+A ritmo normal de habla, 150 palabras ≈ 1 minuto. El cuerpo (campo "body") debe tener entre 120 y 200 palabras.
+Una opinión necesita contexto, evidencia y remate — si el cuerpo tiene menos de 100 palabras, falta desarrollo.
 
 TEMA: {title}
 CONTEXTO: {context}
@@ -252,7 +268,7 @@ Responde SOLO con JSON (sin markdown, sin ```):
   "title": "título corto para Notion (máx 60 caracteres)",
   "topic_context": "por qué este tema genera debate y por qué tu experiencia es relevante",
   "hook": "el gancho — revela la postura desde el primer segundo, máximo 12 palabras",
-  "body": "guión completo (40-75 segundos): postura → evidencia personal → concesión honesta",
+  "body": "guión completo — mínimo 120 palabras, máximo 200. Postura → evidencia personal → concesión honesta.",
   "cta": "cierre que alguien mande a quien no estaría de acuerdo",
   "visual_idea": "setup visual que refuerce la opinión desde el primer frame",
   "filming_tips": ["tip 1 para que la opinión se vea auténtica", "tip 2", "tip 3 opcional"],
