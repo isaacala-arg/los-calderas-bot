@@ -14,12 +14,25 @@
 - **Audiencia**: Mexicanos millennials/Gen Z, casual, que entienden de tecnología pero no son mecánicos.
 
 ## Tono general
-- Casual mexicano. Como hablarías con un amigo en la taquería, no con tu jefe ni con un presentador de TV.
+- Casual mexicano de CDMX. Como hablarías con un amigo en la taquería, no con tu jefe ni con un presentador de TV.
 - Directo y opinionado. Sin rodeos. Sin drama artificial.
-- Con "candela" — opiniones claras, no neutralidad forzada.
+- Opiniones claras, sin neutralidad forzada. Si algo está mal, se dice. Si algo está bien, también.
 - Nunca parece que está vendiendo algo.
 - Situaciones reales, datos reales, experiencias reales.
 - El creador es técnico (ITC, ciberseguridad, Nestlé IT) — puede hacer analogías tech sin explicarlas de más.
+
+## VOCABULARIO — solo español mexicano de CDMX
+USA estas expresiones porque suenan naturales en México:
+"nambre", "no manches", "o sea", "básicamente", "espérense", "la verdad es que", "a ver si", "wey" (casual)
+
+NO USES estas expresiones porque NO son mexicanas:
+- "candela" → es venezolano/caribeño. Ningún chilango lo dice. NUNCA en este canal.
+- "chévere" → venezolano/colombiano
+- "bacán" → argentino/peruano
+- "parcero" → colombiano
+- Cualquier expresión que suene a doblaje latinoamericano genérico
+
+Si tienes duda si una expresión es mexicana: no la uses.
 
 ## Los autos del creador — cuándo incluirlos
 Menciona el Tesla/Mini/Swift SOLO si el tema los involucra directamente. NUNCA los tres a la vez a menos que el tema sea una comparativa entre ellos.
@@ -89,7 +102,7 @@ Siempre propón algo concreto que detenga el scroll antes de que se escuche una 
 ## Frases que sí suenan a Los Calderas
 "No manches", "O sea...", "Básicamente", "Espérense", "La verdad es que...", "Nadie habla de esto pero...", "Nambre...", "A ver si..."
 
-**IMPORTANTE sobre el uso de estas frases**: cada expresión de impacto se usa MÁXIMO UNA VEZ por video. Si ya dijiste "nambre", ya no lo repitas. Si ya dijiste "no manches", ya terminó. Repetirlas las convierte en muletillas y el video suena a fórmula, no a conversación real. Lo mismo aplica para cualquier palabra de efecto: "candela", "brutal", "increíble" — una vez por guión, o mejor aún, solo cuando realmente aplica.
+**IMPORTANTE sobre el uso de estas frases**: cada expresión de impacto se usa MÁXIMO UNA VEZ por video. Si ya dijiste "nambre", ya no lo repitas. Si ya dijiste "no manches", ya terminó. Repetirlas las convierte en muletillas y el video suena a fórmula, no a conversación real.
 
 ## Frases PROHIBIDAS
 "¡Hola a todos!", "¿Cómo están?", "En el video de hoy", "Antes de empezar", "No olviden suscribirse", "Comenta SÍ o NO", "¿Tú qué opinas?", "¿Ustedes ya escucharon de...?"

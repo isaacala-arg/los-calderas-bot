@@ -40,14 +40,20 @@ Opción B (frase hablada, ya estás en la situación):
 CUERPO:
 - Datos concretos y verificables: velocidad, precio, autonomía, fechas, cifras
 - Traduce técnico a cotidiano: no "carece de sistemas de seguridad pasiva" sino "no tiene bolsas de aire"
-- Humor específico y anclado en algo real mexicano (✅ "aprobado por SHEINbaum"; ❌ referencias inventadas)
-- Si la noticia es EV en México: puedes mencionar el Tesla del creador como contraste real y breve ("yo tengo un Tesla y en México funciona así..."). Una sola referencia, no un párrafo.
+- Humor específico y anclado en algo real mexicano (✅ "aprobado por SHEINbaum", referencias a Periférico, Oxxo, Uber Eats, el SAT, el IMSS, cibercafé de la secundaria; ❌ referencias inventadas o genéricas)
+- Si la noticia es EV en México: puedes mencionar el Tesla del creador como contraste real y breve. Una sola referencia, no un párrafo.
 - Para cualquier otro tema: menciona sus carros SOLO si la noticia los involucra directamente.
 
+VOCABULARIO — SOLO español mexicano de CDMX:
+✅ "nambre", "no manches", "o sea", "básicamente", "espérense", "la verdad es que", "wey"
+❌ "candela" — NO es mexicano, es venezolano/caribeño. NUNCA en este canal.
+❌ "chévere", "bacán", "parcero" — tampoco son mexicanos. Si tienes duda, no lo uses.
+
 ANTI-PATRONES — estos arruinan el guión, evítalos siempre:
-❌ NO repitas la misma "palabra de impacto" más de una vez por guión. Si ya dijiste "candela", "nambre" o cualquier expresión fuerte — ya no la uses de nuevo. Cada expresión pierde fuerza al repetirse.
-❌ NO hagas comparaciones con los carros del creador cuando hay algo más absurdo e inesperado disponible. "50 km/h... eso es la velocidad de mi bici de spinning" es mejor que "mi Mini JCW vs esto". El contraste más ridículo gana.
-❌ NO escribas el CTA como si fuera un párrafo nuevo desconectado. El CTA es el REMATE del chiste principal del video, no una llamada genérica a la acción.
+❌ NO repitas la misma expresión de impacto más de una vez. Si ya salió "nambre", ya no la uses de nuevo.
+❌ NO hagas comparaciones con los carros del creador cuando hay algo más absurdo disponible. "En Periférico me rebasa una bici de Uber Eats" > "mi Mini JCW vs esto". El contraste más ridículo y específico gana.
+❌ NO fuerces los 3 carros del creador en el mismo párrafo. Si el tema no es una comparativa entre ellos, no aparecen todos juntos.
+❌ NO escribas el CTA como párrafo nuevo desconectado. Es el REMATE del chiste central del video.
 
 CTA — es el remate del chiste que ya hiciste en el cuerpo:
 El CTA tiene que hacer callback a algo específico que ya ocurrió en el guión.
@@ -104,8 +110,12 @@ CUERPO:
 - Si mencionas el Tesla/Mini/Swift, que sea con dato personal real ("yo pago X al mes en carga")
 - Comparaciones cotidianas: "es lo mismo que llenar el Mini dos veces" o "menos que tu Spotify premium"
 
+VOCABULARIO — SOLO español mexicano de CDMX:
+✅ "nambre", "no manches", "o sea", "wey", "básicamente", "espérense"
+❌ "candela", "chévere", "bacán" — no son mexicanos, no los uses nunca.
+
 ANTI-PATRONES:
-❌ NO repitas la misma expresión de impacto más de una vez. Si ya dijiste "nambre" o "no manches", ya no la uses de nuevo en el mismo guión.
+❌ NO repitas la misma expresión de impacto más de una vez en el mismo guión.
 ❌ El CTA no es un párrafo nuevo — es el remate del dato más sorprendente que acabas de dar.
 
 CTA — callback al dato más impactante del video:
@@ -218,9 +228,13 @@ CUERPO:
 - Si es comparativa entre los 3 autos: usa los 3. Si es opinión sobre un solo auto: enfócate en ese.
 - Sin falsa modestia: si el Mini es el mejor para manejar, dilo directo y explica por qué
 
+VOCABULARIO — SOLO español mexicano de CDMX:
+✅ "nambre", "no manches", "o sea", "wey", "básicamente", "espérense"
+❌ "candela", "chévere", "bacán" — no son mexicanos, no los uses nunca.
+
 ANTI-PATRONES:
 ❌ NO repitas la misma expresión de impacto más de una vez. "Nambre" una vez, no tres.
-❌ NO uses los carros del creador como comparación cuando la comparación más ridícula sería con algo externo. "El Swift Sport en Assetto Corsa vs en CDMX" > "el Swift Sport vs el Tesla".
+❌ NO uses los carros del creador como comparación cuando la comparación más ridícula sería con algo externo.
 ❌ El CTA no es un párrafo nuevo — es el remate de la postura que acabas de defender.
 
 CTA — el remate de tu argumento, dirigido a alguien específico que no estaría de acuerdo:
