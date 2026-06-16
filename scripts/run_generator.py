@@ -1,5 +1,6 @@
 import sys
 import os
+from datetime import date
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -8,7 +9,7 @@ from src.sources.reddit_fetcher import fetch_posts
 from src.sources.youtube_fetcher import fetch_trending
 from src.sources.trends_fetcher import fetch_trends
 from src.brain.evaluator import evaluate
-from src.brain.script_generator import generate, generate_evergreen
+from src.brain.script_generator import generate, generate_howto, generate_lifestyle, generate_opinion
 from src.outputs.notion_writer import write_script
 
 
@@ -26,21 +27,39 @@ def main():
 
     result = evaluate(articles)
 
-    scripts_generated = 0
+    # Script 1: trend — from the top news article of the day
+    if result.top_articles:
+        top = result.top_articles[0]
+        print(f"Generating trend script for: {top.title}")
+        script1 = generate(top, script_type="trend")
+    else:
+        print("No top articles found, generating opinion instead")
+        script1 = generate_opinion()
+    url1 = write_script(script1)
+    print(f"[1/3] Trend script saved: {url1}")
 
-    for article in result.top_articles[:3]:
-        print(f"Generating trend script for: {article.title}")
-        script = generate(article, script_type="trend")
-        url = write_script(script)
-        print(f"Script saved: {url}")
-        scripts_generated += 1
+    # Script 2: rotates between howto and opinion by day of week
+    # Even days = howto, odd days = opinion — keeps content fresh
+    day_of_week = date.today().weekday()
+    if day_of_week % 2 == 0:
+        print("Generating how-to script...")
+        script2 = generate_howto()
+    else:
+        print("Generating opinion script...")
+        script2 = generate_opinion()
+    url2 = write_script(script2)
+    print(f"[2/3] {script2.script_type.capitalize()} script saved: {url2}")
 
-    while scripts_generated < 3:
-        print("Generating evergreen script...")
-        script = generate_evergreen()
-        url = write_script(script)
-        print(f"Evergreen script saved: {url}")
-        scripts_generated += 1
+    # Script 3: lifestyle — always, every day
+    print("Generating lifestyle script...")
+    script3 = generate_lifestyle()
+    url3 = write_script(script3)
+    print(f"[3/3] Lifestyle script saved: {url3}")
+
+    print(f"\nDone! 3 scripts generated:")
+    print(f"  1. Trend     → {url1}")
+    print(f"  2. {script2.script_type.capitalize():<9} → {url2}")
+    print(f"  3. Lifestyle → {url3}")
 
 
 if __name__ == "__main__":

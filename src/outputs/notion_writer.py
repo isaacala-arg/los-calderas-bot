@@ -41,8 +41,7 @@ def write_script(script: Script) -> str:
             _p(f"TikTok: {' '.join(script.hashtags_tiktok)}"),
             _p(f"Reels: {' '.join(script.hashtags_reels)}"),
             _p(f"Shorts: {' '.join(script.hashtags_shorts)}"),
-            _h2("📱 TELEPROMPTER — copia y lee"),
-            _p(f"{script.hook}\n\n{script.body}\n\n{script.cta}"),
+            *_teleprompter_section(script),
         ],
     )
     return response["url"]
@@ -60,6 +59,18 @@ def _p(text: str) -> dict:
         "object": "block", "type": "paragraph",
         "paragraph": {"rich_text": [{"text": {"content": text}}]},
     }
+
+
+def _teleprompter_section(script) -> list:
+    if script.script_type == "lifestyle":
+        return [
+            _h2("🎬 PLAN DE ESCENAS — improvisar en cámara"),
+            _p(script.body),
+        ]
+    return [
+        _h2("📱 TELEPROMPTER — copia y lee"),
+        _p(f"{script.hook}\n\n{script.body}\n\n{script.cta}"),
+    ]
 
 
 def _bullet(text: str) -> dict:
