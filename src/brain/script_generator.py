@@ -402,7 +402,35 @@ def _load_voice_guide() -> str:
         return f.read()
 
 
-def generate(article: Article, script_type: str = "trend") -> Script:
+def build_canal_context(recent_titles: list[str], approved_examples: list[dict]) -> str:
+    """Build the canal context block to append to generation prompts.
+
+    Tells Gemini which topics are already covered and what style Isaac approved.
+    """
+    parts = []
+    if recent_titles:
+        titles_text = "\n".join(f"- {t}" for t in recent_titles)
+        parts.append(
+            "TEMAS RECIENTES EN EL CANAL — NO repitas exactamente estos temas. "
+            "Si el tema es similar, busca un ángulo completamente distinto:\n" + titles_text
+        )
+    if approved_examples:
+        lines = []
+        for ex in approved_examples:
+            line = f'- "{ex["title"]}" ({ex["type"]})'
+            if ex.get("hook"):
+                line += f' — Hook aprobado por Isaac: "{ex["hook"]}"'
+            lines.append(line)
+        parts.append(
+            "GUIONES QUE ISAAC APROBÓ — estudia su estilo de título y gancho para replicarlo:\n"
+            + "\n".join(lines)
+        )
+    if not parts:
+        return ""
+    return "\n\n".join(parts)
+
+
+def generate(article: Article, script_type: str = "trend", canal_context: str = "") -> Script:
     voice_guide = _load_voice_guide()
     prompt_template = _PROMPT_BY_TYPE.get(script_type, _TREND_PROMPT)
     prompt = prompt_template.format(
@@ -410,12 +438,14 @@ def generate(article: Article, script_type: str = "trend") -> Script:
         title=article.title,
         context=article.summary,
     )
+    if canal_context:
+        prompt += f"\n\n---\n\nCONTEXTO DEL CANAL:\n{canal_context}"
     client = _get_client()
     response = _call_gemini(client, "gemini-2.5-flash", prompt, config=_SEARCH_CONFIG)
     return _parse_response(response, script_type)
 
 
-def generate_howto() -> Script:
+def generate_howto(canal_context: str = "") -> Script:
     topic = random.choice(_HOWTO_TOPICS)
     article = Article(
         title=topic["title"],
@@ -424,10 +454,10 @@ def generate_howto() -> Script:
         source="howto",
         published=datetime.utcnow(),
     )
-    return generate(article, script_type="howto")
+    return generate(article, script_type="howto", canal_context=canal_context)
 
 
-def generate_lifestyle() -> Script:
+def generate_lifestyle(canal_context: str = "") -> Script:
     topic = random.choice(_LIFESTYLE_TOPICS)
     article = Article(
         title=topic["title"],
@@ -436,10 +466,10 @@ def generate_lifestyle() -> Script:
         source="lifestyle",
         published=datetime.utcnow(),
     )
-    return generate(article, script_type="lifestyle")
+    return generate(article, script_type="lifestyle", canal_context=canal_context)
 
 
-def generate_opinion() -> Script:
+def generate_opinion(canal_context: str = "") -> Script:
     topic = random.choice(_OPINION_TOPICS)
     article = Article(
         title=topic["title"],
@@ -448,11 +478,11 @@ def generate_opinion() -> Script:
         source="opinion",
         published=datetime.utcnow(),
     )
-    return generate(article, script_type="opinion")
+    return generate(article, script_type="opinion", canal_context=canal_context)
 
 
-def generate_evergreen() -> Script:
+def generate_evergreen(canal_context: str = "") -> Script:
     """Legacy: alternates between howto and opinion."""
     if random.random() < 0.5:
-        return generate_howto()
-    return generate_opinion()
+        return generate_howto(canal_context=canal_context)
+    return generate_opinion(canal_context=canal_context)

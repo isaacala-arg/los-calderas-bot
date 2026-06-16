@@ -7,8 +7,9 @@ from google import genai
 from google.genai import types
 from google.genai.errors import ServerError
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
-from src.brain.script_generator import generate
+from src.brain.script_generator import generate, build_canal_context
 from src.outputs.notion_writer import write_script
+from src.outputs.notion_reader import get_recent_titles, get_approved_examples
 from src.models import Article
 from datetime import datetime
 
@@ -65,8 +66,12 @@ def main():
     print(f"Investigando tema: {topic}")
     article = research_topic(topic)
 
+    recent_titles = get_recent_titles(days=45)
+    approved_examples = get_approved_examples(limit=4)
+    canal_context = build_canal_context(recent_titles, approved_examples)
+
     print("Generando guión...")
-    script = generate(article, script_type="trend")
+    script = generate(article, script_type="trend", canal_context=canal_context)
 
     url = write_script(script)
     print(f"Guión guardado en Notion: {url}")
