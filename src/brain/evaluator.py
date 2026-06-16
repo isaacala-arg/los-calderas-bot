@@ -47,7 +47,7 @@ def evaluate(articles: list) -> EvaluationResult:
 
     client = _get_client()
     response = client.models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash",
         contents=_PROMPT.format(articles_text=articles_text),
     )
     raw = response.text.strip()
