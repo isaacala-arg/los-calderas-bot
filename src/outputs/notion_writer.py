@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from notion_client import Client
 from src.models import Script
 
@@ -20,6 +21,8 @@ def write_script(script: Script) -> str:
         properties={
             "Título": {"title": [{"text": {"content": script.title}}]},
             "Tipo": {"select": {"name": script.script_type}},
+            "Estado": {"select": {"name": "Pendiente"}},
+            "Fecha": {"date": {"start": datetime.now(timezone.utc).strftime("%Y-%m-%d")}},
         },
         children=[
             _h2("Contexto del tema"),
