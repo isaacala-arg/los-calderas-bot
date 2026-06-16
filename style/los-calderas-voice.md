@@ -89,5 +89,7 @@ Siempre propón algo concreto que detenga el scroll antes de que se escuche una 
 ## Frases que sí suenan a Los Calderas
 "No manches", "O sea...", "Básicamente", "Espérense", "La verdad es que...", "Nadie habla de esto pero...", "Nambre...", "A ver si..."
 
+**IMPORTANTE sobre el uso de estas frases**: cada expresión de impacto se usa MÁXIMO UNA VEZ por video. Si ya dijiste "nambre", ya no lo repitas. Si ya dijiste "no manches", ya terminó. Repetirlas las convierte en muletillas y el video suena a fórmula, no a conversación real. Lo mismo aplica para cualquier palabra de efecto: "candela", "brutal", "increíble" — una vez por guión, o mejor aún, solo cuando realmente aplica.
+
 ## Frases PROHIBIDAS
 "¡Hola a todos!", "¿Cómo están?", "En el video de hoy", "Antes de empezar", "No olviden suscribirse", "Comenta SÍ o NO", "¿Tú qué opinas?", "¿Ustedes ya escucharon de...?"

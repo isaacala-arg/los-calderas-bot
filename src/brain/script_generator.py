@@ -41,12 +41,19 @@ CUERPO:
 - Datos concretos y verificables: velocidad, precio, autonomía, fechas, cifras
 - Traduce técnico a cotidiano: no "carece de sistemas de seguridad pasiva" sino "no tiene bolsas de aire"
 - Humor específico y anclado en algo real mexicano (✅ "aprobado por SHEINbaum"; ❌ referencias inventadas)
-- Si la noticia es sobre un carro eléctrico o tecnología EV en México: SÍ puedes referenciar el Tesla del creador ("yo tengo un Tesla y en la vida real funciona así...") como contraste o validación real. Esto conecta la tendencia con experiencia propia.
+- Si la noticia es EV en México: puedes mencionar el Tesla del creador como contraste real y breve ("yo tengo un Tesla y en México funciona así..."). Una sola referencia, no un párrafo.
 - Para cualquier otro tema: menciona sus carros SOLO si la noticia los involucra directamente.
 
-CTA: ¿a quién específicamente le va a mandar esto el espectador?
-  ✅ "Mándale esto a tu familiar que cree que el gobierno se preocupa por el medio ambiente"
-  ❌ "Comenta SÍ o NO" — PROHIBIDO
+ANTI-PATRONES — estos arruinan el guión, evítalos siempre:
+❌ NO repitas la misma "palabra de impacto" más de una vez por guión. Si ya dijiste "candela", "nambre" o cualquier expresión fuerte — ya no la uses de nuevo. Cada expresión pierde fuerza al repetirse.
+❌ NO hagas comparaciones con los carros del creador cuando hay algo más absurdo e inesperado disponible. "50 km/h... eso es la velocidad de mi bici de spinning" es mejor que "mi Mini JCW vs esto". El contraste más ridículo gana.
+❌ NO escribas el CTA como si fuera un párrafo nuevo desconectado. El CTA es el REMATE del chiste principal del video, no una llamada genérica a la acción.
+
+CTA — es el remate del chiste que ya hiciste en el cuerpo:
+El CTA tiene que hacer callback a algo específico que ya ocurrió en el guión.
+  ✅ Si el video hizo chiste con "SHEINbaum" → el CTA lo cierra: "Mándale esto a tu familiar que se queja de los eléctricos pero bien que ya va a apoyar a Sheinbaum con su Olinia"
+  ✅ Si el video mencionó que va a 50 km/h → CTA: "Guarda esto para cuando tu familiar llegue tarde en su Olinia porque fue a 50 en Periférico"
+  ❌ "Mándale esto a tu familiar que jura que todos los eléctricos son como el Tesla" — demasiado genérico, no conecta con nada del video
 
 CONSEJOS DE GRABACIÓN: 2-3 tips muy concretos para ESTE video específico
   ✅ "Empieza con texto 'El gobierno ya tiene su carro' en negro sobre blanco, 1.5 seg, luego corte a cara de duda"
@@ -97,10 +104,14 @@ CUERPO:
 - Si mencionas el Tesla/Mini/Swift, que sea con dato personal real ("yo pago X al mes en carga")
 - Comparaciones cotidianas: "es lo mismo que llenar el Mini dos veces" o "menos que tu Spotify premium"
 
-CTA: este video se guarda porque es información útil
-  ✅ "Guarda esto para cuando te pregunten si los eléctricos son caros en México"
-  ✅ "Mándale esto a tu familiar que cree que los eléctricos salen carísimos"
-  ❌ "Comenta SÍ o NO" — PROHIBIDO
+ANTI-PATRONES:
+❌ NO repitas la misma expresión de impacto más de una vez. Si ya dijiste "nambre" o "no manches", ya no la uses de nuevo en el mismo guión.
+❌ El CTA no es un párrafo nuevo — es el remate del dato más sorprendente que acabas de dar.
+
+CTA — callback al dato más impactante del video:
+  ✅ Si dijiste que cuesta menos que Netflix → CTA: "Guarda esto para cuando te pregunten si los eléctricos son caros... mientras pagas tu Netflix sin chistar"
+  ✅ Si dijiste X minutos de carga → CTA: "Mándale esto a tu familiar que dice que cargar es tardadísimo"
+  ❌ CTAs genéricos desconectados del dato central — PROHIBIDO
 
 CONSEJOS DE GRABACIÓN: 2-3 tips para hacer este video visual aunque sea informativo
   ✅ "Muestra la pantalla del carro o la app de carga mientras das el dato, no hables solo a la cámara"
@@ -207,10 +218,16 @@ CUERPO:
 - Si es comparativa entre los 3 autos: usa los 3. Si es opinión sobre un solo auto: enfócate en ese.
 - Sin falsa modestia: si el Mini es el mejor para manejar, dilo directo y explica por qué
 
-CTA: este video se comparte a alguien que no estaría de acuerdo
-  ✅ "Mándale esto al que insiste en que los eléctricos son aburridos"
-  ✅ "Guarda esto para la próxima vez que alguien te diga que el Swift Sport no sirve"
+ANTI-PATRONES:
+❌ NO repitas la misma expresión de impacto más de una vez. "Nambre" una vez, no tres.
+❌ NO uses los carros del creador como comparación cuando la comparación más ridícula sería con algo externo. "El Swift Sport en Assetto Corsa vs en CDMX" > "el Swift Sport vs el Tesla".
+❌ El CTA no es un párrafo nuevo — es el remate de la postura que acabas de defender.
+
+CTA — el remate de tu argumento, dirigido a alguien específico que no estaría de acuerdo:
+  ✅ "Mándale esto a tu cuate que dice que los deportivos pequeños no sirven en México"
+  ✅ "Guarda esto para cuando alguien te diga que tener un eléctrico en México es un error"
   ❌ "¿Tú con cuál te quedarías?" — PROHIBIDO
+  ❌ CTAs que no conectan con ningún argumento del video — PROHIBIDO
 
 CONSEJOS DE GRABACIÓN: 2-3 tips para que la opinión se vea auténtica y no producida
   ✅ "Di la postura mientras manejas uno de los carros, no parado mirando a la cámara"
