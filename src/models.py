@@ -28,6 +28,7 @@ class Script:
     body: str
     cta: str
     visual_idea: str
+    filming_tips: list          # list[str]
     hashtags_tiktok: list       # list[str]
     hashtags_reels: list        # list[str]
     hashtags_shorts: list       # list[str]

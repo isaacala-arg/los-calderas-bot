@@ -22,6 +22,7 @@ def _mock_script_json():
         "body": "Todo empezó el lunes cuando decidí activar el FSD...",
         "cta": "Guarda esto para cuando alguien te diga que los eléctricos no sirven en México",
         "visual_idea": "Cámara fija desde asiento trasero. Tú leyendo un libro. El volante girando solo.",
+        "filming_tips": ["Empieza con el libro en el asiento trasero, sin hablar, 2 segundos", "Cuando dices el dato del precio, muestra la pantalla del carro"],
         "hashtags_tiktok": ["#Tesla", "#FSD", "#AutosElectricos", "#Mexico", "#TeslaMexico"],
         "hashtags_reels": ["#Tesla", "#FSD", "#AutosElectricosMexico"],
         "hashtags_shorts": ["#Tesla", "#FSD", "#Mexico"],

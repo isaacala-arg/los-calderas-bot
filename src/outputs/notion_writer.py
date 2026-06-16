@@ -35,6 +35,8 @@ def write_script(script: Script) -> str:
             _p(script.cta),
             _h2("🎬 Idea Visual"),
             _p(script.visual_idea),
+            _h2("🎬 Consejos de grabación"),
+            *[_bullet(tip) for tip in script.filming_tips],
             _h2("Hashtags"),
             _p(f"TikTok: {' '.join(script.hashtags_tiktok)}"),
             _p(f"Reels: {' '.join(script.hashtags_reels)}"),
@@ -57,4 +59,11 @@ def _p(text: str) -> dict:
     return {
         "object": "block", "type": "paragraph",
         "paragraph": {"rich_text": [{"text": {"content": text}}]},
+    }
+
+
+def _bullet(text: str) -> dict:
+    return {
+        "object": "block", "type": "bulleted_list_item",
+        "bulleted_list_item": {"rich_text": [{"text": {"content": text}}]},
     }

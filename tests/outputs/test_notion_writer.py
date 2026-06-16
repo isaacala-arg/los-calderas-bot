@@ -11,6 +11,7 @@ def _make_script():
         body="Todo empezó el lunes...",
         cta="Guarda esto para cuando alguien te diga que los eléctricos no sirven",
         visual_idea="Tú en asiento trasero leyendo, FSD activo, volante girando solo",
+        filming_tips=["Empieza con el libro visible, sin hablar, 2 segundos", "Muestra la pantalla del carro al dar el dato"],
         hashtags_tiktok=["#Tesla", "#FSD"],
         hashtags_reels=["#Tesla"],
         hashtags_shorts=["#Tesla"],

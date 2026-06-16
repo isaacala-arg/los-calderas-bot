@@ -4,12 +4,17 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from google import genai
+from google.genai import types
 from google.genai.errors import ServerError
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 from src.brain.script_generator import generate
 from src.outputs.notion_writer import write_script
 from src.models import Article
 from datetime import datetime
+
+_SEARCH_CONFIG = types.GenerateContentConfig(
+    tools=[types.Tool(google_search=types.GoogleSearch())]
+)
 
 
 @retry(
@@ -18,8 +23,8 @@ from datetime import datetime
     retry=retry_if_exception_type(ServerError),
     reraise=True,
 )
-def _call_gemini(client, model: str, contents: str):
-    return client.models.generate_content(model=model, contents=contents)
+def _call_gemini(client, model: str, contents: str, config=None):
+    return client.models.generate_content(model=model, contents=contents, config=config)
 
 
 def research_topic(topic: str) -> Article:
@@ -28,18 +33,19 @@ def research_topic(topic: str) -> Article:
     response = _call_gemini(
         client,
         "gemini-2.5-flash",
-        f"""Investiga este tema para el canal automotriz mexicano "Los Calderas":
+        f"""Investiga este tema buscando en internet para el canal automotriz mexicano "Los Calderas":
 
 TEMA: {topic}
 
-Proporciona un resumen factual y detallado que incluya:
-- Qué pasó exactamente y cuándo
+Busca información actual y proporciona un resumen factual que incluya:
+- Qué pasó exactamente y cuándo (con fechas reales)
+- Datos concretos: precios, velocidades, autonomía, dimensiones, fechas de lanzamiento, cifras de ventas
 - Por qué es relevante para México y la industria automotriz
-- Datos, cifras o estadísticas relevantes si las conoces
-- Contexto de la industria automotriz
-- Si aplica: cómo afecta a dueños de Tesla, Mini o Suzuki Swift
+- Contexto: cómo se compara con otros productos similares
+- Solo si aplica directamente: cómo afecta a dueños de Tesla, Mini o Suzuki Swift
 
-Responde en español, 4-5 párrafos, tono informativo y preciso.""",
+Responde en español, 4-5 párrafos, tono informativo y preciso. Prioriza datos verificables sobre especulación.""",
+        config=_SEARCH_CONFIG,
     )
     return Article(
         title=topic,
