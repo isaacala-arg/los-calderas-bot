@@ -18,7 +18,7 @@ def write_script(script: Script) -> str:
     response = notion.pages.create(
         parent={"database_id": settings.NOTION_DATABASE_ID},
         properties={
-            "Name": {"title": [{"text": {"content": script.title}}]},
+            "Título": {"title": [{"text": {"content": script.title}}]},
             "Tipo": {"select": {"name": script.script_type}},
         },
         children=[
