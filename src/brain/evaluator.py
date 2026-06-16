@@ -86,7 +86,7 @@ def evaluate(articles: list) -> EvaluationResult:
     except json.JSONDecodeError as e:
         raise ValueError(f"Gemini returned non-JSON response: {raw[:200]}") from e
 
-    top_articles = [articles[i] for i in data["top_3_indices"] if i < len(articles)]
+    top_articles = [articles[i] for i in data["top_3_indices"] if i is not None and i < len(articles)]
     idx = data.get("urgency_index")
     urgent_article = articles[idx] if (idx is not None and idx < len(articles)) else None
 
