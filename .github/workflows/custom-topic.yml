@@ -1,0 +1,32 @@
+name: Tema Personalizado
+
+on:
+  workflow_dispatch:
+    inputs:
+      tema:
+        description: 'Tema a investigar (ej: Hackearon a Renault, Tesla sube precios en México)'
+        required: true
+        type: string
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate script for custom topic
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          CUSTOM_TOPIC: ${{ inputs.tema }}
+        run: python scripts/run_custom_topic.py

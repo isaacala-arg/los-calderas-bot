@@ -36,6 +36,8 @@ def write_script(script: Script) -> str:
             _p(f"TikTok: {' '.join(script.hashtags_tiktok)}"),
             _p(f"Reels: {' '.join(script.hashtags_reels)}"),
             _p(f"Shorts: {' '.join(script.hashtags_shorts)}"),
+            _h2("📱 TELEPROMPTER — copia y lee"),
+            _p(f"{script.hook}\n\n{script.body}\n\n{script.cta}"),
         ],
     )
     return response["url"]

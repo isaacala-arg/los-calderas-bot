@@ -26,16 +26,21 @@ def main():
 
     result = evaluate(articles)
 
-    if result.top_articles:
-        top = result.top_articles[0]
-        print(f"Generating script for: {top.title}")
-        script = generate(top, script_type="trend")
-    else:
-        print("No strong articles found — generating evergreen content")
-        script = generate_evergreen()
+    scripts_generated = 0
 
-    url = write_script(script)
-    print(f"Script saved to Notion: {url}")
+    for article in result.top_articles[:3]:
+        print(f"Generating trend script for: {article.title}")
+        script = generate(article, script_type="trend")
+        url = write_script(script)
+        print(f"Script saved: {url}")
+        scripts_generated += 1
+
+    while scripts_generated < 3:
+        print("Generating evergreen script...")
+        script = generate_evergreen()
+        url = write_script(script)
+        print(f"Evergreen script saved: {url}")
+        scripts_generated += 1
 
 
 if __name__ == "__main__":
