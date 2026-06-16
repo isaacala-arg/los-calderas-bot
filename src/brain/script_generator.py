@@ -41,7 +41,8 @@ CUERPO:
 - Datos concretos y verificables: velocidad, precio, autonomía, fechas, cifras
 - Traduce técnico a cotidiano: no "carece de sistemas de seguridad pasiva" sino "no tiene bolsas de aire"
 - Humor específico y anclado en algo real mexicano (✅ "aprobado por SHEINbaum"; ❌ referencias inventadas)
-- Solo menciona el Tesla/Mini/Swift del creador si la noticia los involucra directamente
+- Si la noticia es sobre un carro eléctrico o tecnología EV en México: SÍ puedes referenciar el Tesla del creador ("yo tengo un Tesla y en la vida real funciona así...") como contraste o validación real. Esto conecta la tendencia con experiencia propia.
+- Para cualquier otro tema: menciona sus carros SOLO si la noticia los involucra directamente.
 
 CTA: ¿a quién específicamente le va a mandar esto el espectador?
   ✅ "Mándale esto a tu familiar que cree que el gobierno se preocupa por el medio ambiente"
@@ -256,16 +257,29 @@ _HOWTO_TOPICS = [
 ]
 
 _LIFESTYLE_TOPICS = [
-    {"title": "Un día de clases en el Tec — el Tesla como oficina móvil", "context": "Rutina real: llegando al Tec, estudiando en el carro entre clases, cargando mientras estudia."},
-    {"title": "Grabé los carros de mis cuates en el Tec — el resultado", "context": "Comparativa espontánea e informal de los carros de amigos de ingeniería vs el Tesla del creador."},
-    {"title": "¿Qué tan raro es llegar al Tec en Tesla?", "context": "Las reacciones reales de compañeros, las preguntas que más le hacen, los mitos que le corrigen."},
-    {"title": "El carro de entre semana vs el carro del fin de semana", "context": "Por qué usa el Tesla entre semana y el Mini o Swift los fines de semana — lógica real."},
-    {"title": "El estacionamiento del Tec: una guerra de clases sobre ruedas", "context": "Observación casual de los carros en el campus — desde Tsurus hasta BMWs, qué dice eso de la uni."},
-    {"title": "Mi rutina de carga semanal — cuándo y dónde cargo el Tesla", "context": "Rutina real como estudiante con Tesla: cuándo aprovecha para cargar, qué aplicaciones usa."},
-    {"title": "El día que el Mini me dejó a pie en CDMX", "context": "Una historia real de cuando el Mini falló o requirió atención — el lado no glamoroso de un carro de nicho."},
-    {"title": "¿Cuál de mis 3 carros llevo a una primera cita?", "context": "Análisis humorístico pero con puntos reales: qué transmite cada carro, qué eligiría y por qué."},
-    {"title": "Manejando el Swift Sport en la autopista — lo que nadie espera", "context": "La sorpresa de la experiencia de carretera en un carro que parece urbano."},
-    {"title": "Un sábado normal: de compras en el Mini JCW", "context": "El contraste entre un carro deportivo y las tareas cotidianas — humor y realidad."},
+    # Vida en el Tec
+    {"title": "Llegando al Tec en Tesla — las reacciones de mis compañeros de ITC", "context": "Isaac estudia ITC en el Tec CEM. La reacción de compañeros de ingeniería cuando llega en Tesla, las preguntas técnicas que le hacen, lo que esperan vs la realidad."},
+    {"title": "El Tesla como oficina entre clases — así estudio en el Tec", "context": "Usar el Tesla como espacio para estudiar, trabajar en CipherPath o llamadas de Nestlé entre clases. La pantalla, el silencio, el AC — por qué funciona mejor que la biblioteca."},
+    {"title": "El estacionamiento del Tec CEM: una radiografía de la generación", "context": "Los carros de los compañeros de ingeniería — desde Tsurus hasta Mazda 3s. Lo que dice de la generación y el contraste con el Tesla del creador."},
+    {"title": "Mi último semestre antes del Semestre Tec — cómo lo viví", "context": "Terminando el 6° semestre de ITC. Proyectos finales, CipherPath, las prácticas en Nestlé, y manejar los 3 carros según el mood del día."},
+    # Nestlé + carros
+    {"title": "Cómo llego al trabajo en Nestlé — y por qué cambié de carro", "context": "Isaac trabaja en innovación IT en Nestlé. La decisión de qué carro llevar al trabajo: Tesla para comodidad, Mini para viernes, Swift para tráfico corto. La lógica real."},
+    {"title": "Un día de trabajo en Nestlé Innovation IT — con Tesla incluido", "context": "Rutina real: saliendo al trabajo, el estacionamiento de Nestlé, qué hace en Innovation IT, y el regreso. El Tesla como parte de la rutina laboral de alguien de 20 años."},
+    # Proyectos personales
+    {"title": "CipherPath: construyendo una startup desde el carro", "context": "Isaac co-funda CipherPath (plataforma de ciberseguridad estilo Duolingo) con ArgISec. Trabaja en ello en el Tesla entre reuniones. La vida de un emprendedor de 20 años con 3 carros."},
+    {"title": "Ser becario en Nestlé y estudiar ingeniería al mismo tiempo", "context": "Balancear Tec CEM + Nestlé Innovation IT + CipherPath + entrenar + los 3 carros. Cómo organiza el tiempo, qué carro usa para qué."},
+    # HyRox + fitness
+    {"title": "Domingo de HyRox — del entrenamiento al carro", "context": "Isaac tiene clases de HyRox cada domingo. El contraste entre el entrenamiento extremo y meterse al Tesla o Mini JCW de regreso. Qué carro lleva al gym y por qué."},
+    {"title": "Mi cambio físico desde abril — y cómo los carros cambiaron con eso", "context": "Empezó un cambio físico el 27 de abril de 2026: gym, HyRox, hábitos. La rutina de manejar cambió — más energía, diferentes horarios, escuchar podcasts de fitness en el Tesla."},
+    # Videojuegos + carros
+    {"title": "Assetto Corsa vs la realidad — manejé el Mini en el juego y en CDMX", "context": "Isaac juega Assetto Corsa (simulador de autos). Comparar la experiencia de manejar el Mini JCW virtual vs real en CDMX: los topes, el tráfico, los sonidos. Lo que el simulador no te prepara."},
+    {"title": "Mis carros en BeamNG — qué tan reales son los daños vs la vida real", "context": "Isaac juega BeamNG Drive (simulador de choques). Comparativa humorística y técnica entre cómo responde el Tesla/Mini/Swift en el juego vs lo que sabe de ingeniería real."},
+    # Amigos y social
+    {"title": "Grabé los carros de mis cuates del Tec — el resultado honesto", "context": "Comparativa informal de los carros de amigos de ingeniería. Los carros de la generación vs el Tesla del creador — sin juicio pero con honestidad."},
+    {"title": "¿Cuál de mis 3 carros llevo a una primera cita?", "context": "Análisis con puntos reales: qué transmite el Tesla (tecnológico, caro), el Mini JCW (apasionado, impráctica), el Swift Sport (honesto, divertido). Sin respuesta correcta, con honestidad."},
+    # Vida cotidiana
+    {"title": "Mi rutina de carga semanal — cuándo y dónde cargo el Tesla en CDMX", "context": "Rutina real: carga en casa, SuperCharger, cuándo lo hace entre Tec y Nestlé. Apps que usa, tiempo que espera, cómo aprovecha la carga."},
+    {"title": "El carro de entre semana vs el carro del finde — mi lógica real", "context": "Por qué usa el Tesla de lunes a viernes y el Mini o Swift los fines de semana. La lógica real detrás de tener 3 opciones en CDMX."},
 ]
 
 _OPINION_TOPICS = [
