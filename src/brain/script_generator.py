@@ -359,6 +359,13 @@ def _call_gemini(client, model: str, contents: str, config=None):
     return client.models.generate_content(model=model, contents=contents, config=config)
 
 
+def _to_str(value) -> str:
+    """Gemini sometimes returns lists instead of strings — join them."""
+    if isinstance(value, list):
+        return "\n\n".join(str(item) for item in value)
+    return str(value) if value is not None else ""
+
+
 def _parse_response(response, script_type: str) -> Script:
     raw = response.text.strip()
     if raw.startswith("```"):
@@ -371,17 +378,21 @@ def _parse_response(response, script_type: str) -> Script:
     except json.JSONDecodeError as e:
         raise ValueError(f"Gemini returned non-JSON response: {raw[:200]}") from e
 
+    filming_tips = data.get("filming_tips", [])
+    if not isinstance(filming_tips, list):
+        filming_tips = [str(filming_tips)]
+
     return Script(
-        title=data["title"],
-        topic_context=data["topic_context"],
-        hook=data["hook"],
-        body=data["body"],
-        cta=data["cta"],
-        visual_idea=data["visual_idea"],
-        filming_tips=data.get("filming_tips", []),
-        hashtags_tiktok=data["hashtags_tiktok"],
-        hashtags_reels=data["hashtags_reels"],
-        hashtags_shorts=data["hashtags_shorts"],
+        title=_to_str(data["title"]),
+        topic_context=_to_str(data["topic_context"]),
+        hook=_to_str(data["hook"]),
+        body=_to_str(data["body"]),
+        cta=_to_str(data["cta"]),
+        visual_idea=_to_str(data["visual_idea"]),
+        filming_tips=filming_tips,
+        hashtags_tiktok=data.get("hashtags_tiktok", []),
+        hashtags_reels=data.get("hashtags_reels", []),
+        hashtags_shorts=data.get("hashtags_shorts", []),
         script_type=data.get("script_type", script_type),
     )
 

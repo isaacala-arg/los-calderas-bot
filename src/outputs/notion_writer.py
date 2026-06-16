@@ -55,6 +55,8 @@ def _h2(text: str) -> dict:
 
 
 def _p(text: str) -> dict:
+    # Notion hard limit: 2000 chars per rich_text content block
+    text = str(text)[:2000]
     return {
         "object": "block", "type": "paragraph",
         "paragraph": {"rich_text": [{"text": {"content": text}}]},
