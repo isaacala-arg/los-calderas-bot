@@ -402,10 +402,14 @@ def _load_voice_guide() -> str:
         return f.read()
 
 
+_IMPACT_EXPRESSIONS = ["nambre", "no manches", "o sea", "básicamente", "espérense", "la verdad es que", "a ver si"]
+
+
 def build_canal_context(recent_titles: list[str], approved_examples: list[dict]) -> str:
     """Build the canal context block to append to generation prompts.
 
-    Tells Gemini which topics are already covered and what style Isaac approved.
+    Tells Gemini which topics are already covered, what style Isaac approved,
+    and which impact expressions were recently used (to force variety).
     """
     parts = []
     if recent_titles:
@@ -414,6 +418,16 @@ def build_canal_context(recent_titles: list[str], approved_examples: list[dict])
             "TEMAS RECIENTES EN EL CANAL — NO repitas exactamente estos temas. "
             "Si el tema es similar, busca un ángulo completamente distinto:\n" + titles_text
         )
+
+    # Detect which impact expressions appeared in recent hooks
+    recent_hooks = [ex.get("hook", "").lower() for ex in approved_examples if ex.get("hook")]
+    used_expressions = [e for e in _IMPACT_EXPRESSIONS if any(e in h for h in recent_hooks)]
+    if used_expressions:
+        parts.append(
+            "EXPRESIONES YA USADAS EN GUIONES RECIENTES — usa una DIFERENTE esta vez:\n"
+            + ", ".join(f'"{e}"' for e in used_expressions)
+        )
+
     if approved_examples:
         lines = []
         for ex in approved_examples:
@@ -441,7 +455,9 @@ def generate(article: Article, script_type: str = "trend", canal_context: str = 
     if canal_context:
         prompt += f"\n\n---\n\nCONTEXTO DEL CANAL:\n{canal_context}"
     client = _get_client()
-    response = _call_gemini(client, "gemini-2.5-flash", prompt, config=_SEARCH_CONFIG)
+    # Search grounding only for trend — howto/lifestyle/opinion use pre-defined topics
+    config = _SEARCH_CONFIG if script_type in ("trend", "evergreen") else None
+    response = _call_gemini(client, "gemini-2.5-flash", prompt, config=config)
     return _parse_response(response, script_type)
 
 

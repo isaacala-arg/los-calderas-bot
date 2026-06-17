@@ -2,7 +2,7 @@ name: Script Generator
 
 on:
   schedule:
-    - cron: "0 1,13 * * *"   # 7pm y 7am CDMX (UTC-6). En verano (CDT/UTC-5) corre a 8pm y 8am.
+    - cron: "0 13 * * 1,3,5"   # 7am CDMX (UTC-6) solo lunes, miércoles y viernes
   workflow_dispatch:            # permite lanzar manualmente desde GitHub
 
 jobs:
