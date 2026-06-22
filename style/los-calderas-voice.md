@@ -73,9 +73,12 @@ Todo está pensado para grabar FÁCIL y editar poco:
 
 ---
 
-# Guiones de referencia (el estándar de calidad — imítalos)
+# Guiones de referencia (SOLO para el TONO — PROHIBIDO copiarlos)
 
-Estos 5 son el tono exacto que busca Isaac. Estúdialos: cómo abre, cómo enseña, dónde mete el chiste, cómo remata.
+⚠️ Estos 5 son SOLO para que captures el **tono, el ritmo y cómo se mete el chiste**.
+**PROHIBIDO reusar su tema, su gancho o sus frases.** Si tu guión se parece a uno de estos —
+sobre todo al de "En mi casa hay un Tesla" o al de la batería — está MAL: recházalo y haz uno con
+un ángulo completamente distinto y más creativo. Son la vara de calidad, no plantillas para rellenar.
 
 ## Ref 1 — HOWTO · "Cargo el Tesla en plazas"
 - **Gancho:** "Llevo meses cargando el Tesla de mi papá y casi no lo siento en mi cartera."

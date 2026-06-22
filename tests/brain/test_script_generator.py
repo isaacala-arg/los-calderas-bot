@@ -104,6 +104,26 @@ def test_generate_evergreen_returns_script(mocker, tmp_path):
     assert script.hook != ""
 
 
+def test_append_avoid_hooks_adds_block():
+    out = sg.append_avoid_hooks("BASE", ["Gancho uno", "Gancho dos"])
+    assert "BASE" in out
+    assert "Gancho uno" in out and "Gancho dos" in out
+    assert "GANCHOS YA GENERADOS HOY" in out
+
+
+def test_append_avoid_hooks_empty_returns_same():
+    assert sg.append_avoid_hooks("BASE", []) == "BASE"
+    assert sg.append_avoid_hooks("", [None, ""]) == ""
+
+
+def test_creatividad_y_anticopia_en_prompt(mocker, tmp_path):
+    _patch_client(mocker, tmp_path, "opinion")
+    prompt = sg._build_prompt("opinion", "tema", "ctx", "")
+    assert "CREATIVIDAD" in prompt
+    assert "ANTI-COPIA" in prompt
+    assert "nambre" in prompt.lower()  # la regla que lo prohíbe como muletilla
+
+
 def test_contexto_actual_injected_into_prompt(mocker, tmp_path):
     mock = _patch_client(mocker, tmp_path, "howto")
     mocker.patch("src.brain.script_generator.CONTEXTO_ACTUAL_PATH", str(tmp_path / "ctx.md"))

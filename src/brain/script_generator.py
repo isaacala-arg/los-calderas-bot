@@ -17,6 +17,24 @@ Si tiene menos de 80 palabras, está incompleto.
 
 REGLA DE ORO: el video tiene que ENSEÑAR algo útil Y dar risa. Si no cumple ambas, reescríbelo.
 
+CREATIVIDAD (lo más importante — los guiones aburridos se rechazan):
+El TEMA SEMILLA es solo un punto de partida. Tu trabajo es encontrar el ángulo MÁS CREATIVO e
+inesperado, NO el obvio de reseñero. Un creador aburrido hace la pregunta predecible; tú haces algo
+que pare el scroll. Compara:
+- ❌ ABURRIDO: "¿Qué pasa si se te acaba la batería del Tesla?" → ✅ CREATIVO: "Le pedí a la IA del Tesla que me dijera la neta de los eléctricos y se puso conspiranoica."
+- ❌ ABURRIDO: "¿Vale la pena un Tesla en México?" → ✅ CREATIVO: "Probé si el FSD del Tesla sobrevive a los topes de mi colonia."
+- ❌ ABURRIDO: "El Swift es subestimado" → ✅ CREATIVO: "Reté a mi Swift contra el Tesla en lo único donde el Tesla no puede ganar."
+Formatos que SÍ jalan (inspirados en creadores reales): el experimento/reto, la prueba en vivo con el
+resultado revelado, "le pregunté a la IA", el dato escondido que nadie muestra, el POV/situación
+("POV: eres becario y el único carro libre es el Tesla de tu papá"), el ranking con giro inesperado.
+
+ANTI-COPIA Y ANTI-REPETICIÓN (crítico):
+- Los guiones de referencia del voice guide son SOLO para captar el TONO y el RITMO. PROHIBIDO reusar
+  su tema, su gancho o sus frases. Si tu guión se parece a uno de ellos, recházalo y haz otro distinto.
+- PROHIBIDO empezar con clichés ya usados: "En mi casa hay un Tesla...", "Nambre...", "La pregunta del millón...".
+  VARÍA la apertura cada vez (una afirmación tajante, una pregunta filosa, una acción ya empezada, un dato brutal).
+- "nambre" está PROHIBIDO como muletilla (ya se sobreusó). Si necesitas una expresión, usa otra y una sola vez.
+
 ENCUADRE DE CARROS (obligatorio, ver voice guide):
 - Swift = de Isaac, el protagonista, el que maneja a diario.
 - Tesla = de su PAPÁ, apodo "el Caldermóvil", tiene FSD, se carga en plazas (cargar cuesta pero menos que gasolina — NUNCA "gratis").
@@ -33,7 +51,7 @@ MODO DIRECTOR (estilo plática, fácil de grabar y editar):
 - "puntos": 2 a 4 puntos para que Isaac improvise con sus palabras (NO teleprompter palabra por palabra).
 - "arranque": las primeras palabras TEXTUALES + qué hace en cámara los primeros 3 segundos.
 
-VOCABULARIO: solo español mexicano de CDMX (nambre, no manches, o sea, la neta, te explico, te lo chismeo, wey). NUNCA candela/chévere/bacán.
+VOCABULARIO: solo español mexicano de CDMX (no manches, o sea, la neta, te explico, te lo chismeo, wey, a ver). EVITA "nambre" (sobreusado). NUNCA candela/chévere/bacán.
 
 Responde SOLO con JSON válido (sin markdown, sin ```):
 {{
@@ -89,43 +107,44 @@ _TYPE_GUIDANCE = {
 }
 
 # ─── BANCOS DE TEMAS ──────────────────────────────────────────────────────────
+# Los temas son SEMILLAS con ángulo creativo. El prompt obliga a llevarlos aún
+# más lejos. Cada uno tiene un FORMATO (experimento, reto, POV, reveal, "le pregunté a la IA").
 _HOWTO_TOPICS = [
-    {"title": "Cuánto cuesta de verdad cargar un Tesla en CDMX", "context": "Costo real de cargar el Caldermóvil (Tesla de su papá) en cargadores de plaza vs lo que costaría de gasolina. Números reales."},
-    {"title": "Cómo funciona el FSD y qué puede hacer en CDMX", "context": "Qué hace solo el FSD del Tesla de su papá, qué requiere que tomes el volante, en tráfico mexicano. Honesto sobre topes y baches."},
-    {"title": "¿Un eléctrico necesita aceite? El mantenimiento real", "context": "Lista real de mantenimiento de un Tesla vs un carro de gasolina como el Swift: costos y frecuencia."},
-    {"title": "¿Cuántos km da de verdad un Tesla en la ciudad?", "context": "Autonomía real del Caldermóvil en CDMX con y sin AC. El número de la app vs la realidad."},
-    {"title": "Lo que de verdad cuesta tener un Swift Sport en México", "context": "Precio, gasolina, mantenimiento, refacciones del Swift de Isaac. Por qué es el más honesto de los 3."},
-    {"title": "Qué pasa si se te acaba la batería de un eléctrico", "context": "El proceso real: qué hace el carro, cómo pides ayuda, cuánto cuesta. Sin drama."},
+    {"title": "Le pedí a la IA del Tesla que me dijera la neta de los eléctricos", "context": "REVELACIÓN: Isaac le pregunta a Grok (la IA dentro del Caldermóvil) las dudas reales de un eléctrico en México (carga, costo, autonomía) y traduce las respuestas con humor. Enseña datos reales en formato divertido."},
+    {"title": "Probé si el FSD sobrevive a los topes de mi colonia", "context": "EXPERIMENTO: Isaac pone el FSD del Tesla de su papá y muestra honestamente qué hace bien y dónde sufre con los topes/baches mexicanos. Enseña cómo funciona el FSD de verdad."},
+    {"title": "Cuánto me cuesta el Swift al mes vs lo que cree la gente", "context": "REVEAL con número: Isaac calcula en vivo el costo real mensual de su Swift (gasolina, mantenimiento) y lo compara con lo que la gente asume. Revela el número al inicio."},
+    {"title": "El truco para cargar un Tesla casi sin que lo sientas en la cartera", "context": "HOW-TO con dato: cómo y dónde carga su papá el Caldermóvil en plazas, cuánto cuesta de verdad vs gasolina. Práctico y con el chiste de hacer el súper por el cargador."},
+    {"title": "Hice que el Tesla planeara un viaje y esto me dijo", "context": "DEMO en vivo: Isaac le pide al Tesla una ruta larga (con paradas de carga) y muestra cómo lo calcula. Enseña que la ansiedad de autonomía es un mito, con humor."},
 ]
 
 _LIFESTYLE_TOPICS = [
-    {"title": "Un día de becario en vacaciones (spoiler: trabajo)", "context": "Home office desde las 8, café recalentado, gym a las 3 (a veces caminando, a veces en el Swift), proyecto en la noche. El chiste becario/precario."},
-    {"title": "Por qué ando en mi Swift teniendo un Tesla en casa", "context": "El Tesla es de su papá (nave, relajado); el Swift es suyo y se siente vivo. Por qué a propósito prefiere el Swift en CDMX."},
-    {"title": "Mi media hora de terapia: manejar al gym", "context": "El trayecto al gym en el Swift con su música es lo único del día donde nadie le escribe. Cambio físico, hábitos."},
-    {"title": "Simulador vs realidad: manejar en Assetto Corsa y en CDMX", "context": "Isaac juega Assetto Corsa. Qué te prepara el simulador y qué NO (los topes, el tráfico real). Humor de ingeniero."},
-    {"title": "El carro del día según mi mood", "context": "Swift para diario, y de vez en cuando el Caldermóvil (de papá) o el Mini (de mamá). La lógica real, con humor de que pide permiso."},
+    {"title": "POV: eres becario y el único carro libre es el de tu papá", "context": "POV/situación: el dilema de agarrar el Caldermóvil (Tesla de papá) vs su Swift. Humor becario/precario, pedir permiso, la presión de no rayarlo."},
+    {"title": "Mi rutina de becario en vacaciones que nadie pidió ver", "context": "Día real con autoburla: home office desde las 8 en pijama, café recalentado 3 veces, gym a las 3 (a veces caminando), proyecto de ciber en la noche. El chiste becario/precario."},
+    {"title": "Manejar al gym es mi terapia más barata", "context": "Pedazo honesto: el trayecto al gym con su música es lo único del día sin notificaciones. Conecta cambio físico + carro + salud mental, con humor."},
+    {"title": "Lo que Assetto Corsa NO te prepara para manejar en CDMX", "context": "Comparación con giro: Isaac juega el simulador y muestra qué sí y qué definitivamente NO te prepara (topes, microbuses, el tío en sentido contrario). Humor de ingeniero gamer."},
+    {"title": "Ranking de los 3 carros de mi familia según para qué sirven", "context": "Ranking con giro: Swift (suyo), Caldermóvil (de papá), Mini (de mamá), cada uno gana en una categoría inesperada. Honesto y divertido, sin decir 'mi Tesla'."},
 ]
 
 _OPINION_TOPICS = [
-    {"title": "El Swift Sport es el carro más subestimado de México", "context": "Por qué el Swift de Isaac da más diversión por peso que carros que cuestan el triple. Evidencia de manejarlo a diario."},
-    {"title": "¿Vale la pena un Tesla en México hoy?", "context": "Opinión honesta desde la experiencia con el Caldermóvil: cuándo sí brilla y cuándo el eléctrico frustra en CDMX."},
-    {"title": "FSD en México: ¿promesa cumplida o marketing?", "context": "Opinión directa tras usar el FSD del Tesla de su papá en calles mexicanas: lo que sí y lo que no."},
-    {"title": "El carro divertido y barato le gana al caro y aburrido", "context": "Swift vs Tesla: qué da más satisfacción real por tu dinero. Postura clara."},
+    {"title": "El carro más caro de mi casa no es el que quiero manejar", "context": "POSTURA con gancho: por qué prefiere su Swift al Caldermóvil de su papá. Diversión vs comodidad. Postura clara desde el inicio, evidencia real, sin copiar fórmulas previas."},
+    {"title": "La verdad incómoda del FSD que los fans no quieren oír", "context": "OPINIÓN filosa: Isaac, como ingeniero, da su postura honesta sobre el FSD en México: dónde es genial y dónde es marketing. Con datos de uso real."},
+    {"title": "Comprar un deportivo barato es más inteligente que un eléctrico caro", "context": "TESIS provocadora: argumento de por qué un Swift Sport da más satisfacción por peso/precio que gastar el triple. Postura tajante con concesión honesta."},
+    {"title": "Manejar un eléctrico te cambia algo que nadie te dice", "context": "OPINIÓN inesperada: el cambio mental real de manejar el Caldermóvil (silencio, no gasolineras, planear) — lo bueno y lo que extrañas de un carro 'normal'."},
 ]
 
 _TECH_TOPICS = [
-    {"title": "La app de IA que uso para todo (no es ChatGPT)", "context": "Cómo Isaac usa Claude para resumir documentos, estudiar y organizarse. Puente: lo cuenta mientras el Tesla maneja con FSD. Visión de ingeniero."},
-    {"title": "3 trucos de ciberseguridad que todos deberían usar", "context": "Isaac es de ciberseguridad: contraseñas, 2FA, no picarle a links raros. Fácil, sin tecnicismos, con humor."},
-    {"title": "Cómo uso la IA para no batallar en la chamba", "context": "Trucos reales de IA para productividad de un becario de tecnología. Útil y aterrizado."},
-    {"title": "El FSD explicado como lo que es: tecnología, no magia", "context": "Isaac, como ingeniero, explica qué hace por dentro el FSD del Tesla (cámaras, IA) sin tecnicismos. El puente carro+tech."},
-    {"title": "Apps que de verdad uso como estudiante de ingeniería", "context": "Stack real de apps de Isaac para estudiar/trabajar/organizarse. Honesto, nada patrocinado."},
+    {"title": "Uso esta IA en el carro y me hace ver más listo de lo que soy", "context": "DEMO + puente: cómo Isaac usa Claude (resumir, estudiar, organizarse) mientras el Tesla maneja con FSD. Autoburla + enseña algo útil de IA. Remate seco."},
+    {"title": "3 cosas de ciberseguridad que haces mal sin saber", "context": "REVEAL útil: Isaac (de ciber) expone 3 errores comunes (contraseñas, 2FA, links) con ejemplos y humor, sin tecnicismos. Enseña algo que la gente sí puede aplicar hoy."},
+    {"title": "Le pregunté a la IA cuál de los 3 carros de mi familia es mejor", "context": "EXPERIMENTO tech+carro: Isaac le da los datos de los 3 carros a una IA y muestra su veredicto vs su propia opinión de ingeniero. Divertido y revelador."},
+    {"title": "El FSD no es magia, es esto (te lo explica un ingeniero)", "context": "EXPLICA simple: qué hace por dentro el FSD (cámaras + IA) en lenguaje de banqueta, mientras lo usa. El puente carro+tech, autoridad real sin presumir."},
+    {"title": "Hackeé mi rutina con IA: chamba + gym + proyecto sin morir", "context": "HOW-TO de productividad: cómo Isaac usa IA para organizar su día de becario/estudiante/emprendedor. Concreto, aplicable, con el toque de que parece de hacker pero es legal."},
 ]
 
 _FSD_TOPICS = [
-    {"title": "5 rolas de dolido para tu terapia en el carro", "context": "El Tesla maneja solo con FSD mientras Isaac da su playlist de canciones de dolido con un comentario chistoso de cada una. Deja las rolas como [tu rola] para que Isaac las ponga."},
-    {"title": "Dejé que el Tesla me llevara a cualquier lado por un café", "context": "Isaac aburrido le pide a Grok/FSD que lo lleve por un café y mientras cuenta 5 datos curiosos de él. Formato storytelling + FSD."},
-    {"title": "5 marcas de autos que te recomiendo (y por qué)", "context": "Mientras el Tesla maneja solo, Isaac da 5 marcas que recomienda con una razón corta y honesta de cada una."},
-    {"title": "Las monerías del Tesla que nadie te muestra así", "context": "Mostrar features cool del Caldermóvil (modo centinela, sonidos, front, pantalla) de forma creativa y divertida, no como reseña aburrida."},
+    {"title": "5 rolas de dolido para tu media hora de terapia en el carro", "context": "FSD + listicle: el Tesla maneja solo mientras Isaac da su playlist de dolido con un comentario chistoso de cada una. Deja las rolas como [tu rola] para que Isaac las ponga."},
+    {"title": "Dejé que el Tesla me llevara a cualquier lado por un café", "context": "FSD + storytelling: Isaac aburrido le pide a Grok/FSD que lo lleve por un café y mientras cuenta 5 datos curiosos de él. Muestra que el carro maneja solo."},
+    {"title": "Califiqué a los conductores de CDMX mientras el Tesla manejaba solo", "context": "FSD + bit: con las manos libres (supervisado), Isaac narra y califica con humor las maniobras locas del tráfico de CDMX que el FSD tiene que esquivar."},
+    {"title": "Las monerías del Tesla que nadie te muestra así", "context": "Reveal creativo: features cool del Caldermóvil (modo centinela, bocina, front, juegos) mostrados de forma divertida y rápida, no como reseña aburrida."},
 ]
 
 
@@ -232,6 +251,19 @@ def build_canal_context(recent_titles: list[str], approved_examples: list[dict])
     if not parts:
         return ""
     return "\n\n".join(parts)
+
+
+def append_avoid_hooks(canal_context: str, used_hooks: list) -> str:
+    """Agrega al contexto los ganchos ya usados en la misma corrida, para que
+    los 3 guiones del día no arranquen igual ni repitan el mismo chiste."""
+    used = [h for h in (used_hooks or []) if h]
+    if not used:
+        return canal_context
+    block = (
+        "GANCHOS YA GENERADOS HOY — usa una apertura y un ángulo COMPLETAMENTE distintos, "
+        "no arranques parecido a estos:\n" + "\n".join(f'- "{h}"' for h in used)
+    )
+    return f"{canal_context}\n\n{block}" if canal_context else block
 
 
 def _build_prompt(script_type: str, title: str, context: str, canal_context: str) -> str:
