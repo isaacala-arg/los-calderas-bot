@@ -19,6 +19,15 @@ No lo rellenes con paja: cada oración debe enseñar algo o dar risa.
 
 REGLA DE ORO: el video tiene que ENSEÑAR algo útil Y dar risa. Si no cumple ambas, reescríbelo.
 
+HUMOR (densidad alta, estilo aprobado por Isaac — ver Ref 6 del voice guide):
+- Para explicar CUALQUIER cosa técnica, usa una metáfora cotidiana mexicana, nunca el término a secas.
+  Ej: el motor que se ahoga = un clavadista; sellado IP67 = tu celular que aguanta el clavado al baño;
+  la electrónica = una tablet de medio millón con ruedas.
+- Prefiere el CHISTE DE DOS TIEMPOS: planta una imagen al inicio y haz que el remate haga callback a
+  ESA misma imagen (clavadista que respira → "se ahogó"). No dos chistes sueltos: uno que se paga solo.
+- Mete VARIOS chistes, pero que cada uno también explique o avance algo. El dato técnico va escondido
+  dentro del chiste, no aparte. Remates mexicanos hiperlocales (Olinia, Periférico, el SAT, coca de piña).
+
 CREATIVIDAD (lo más importante — los guiones aburridos se rechazan):
 El TEMA SEMILLA es solo un punto de partida. Tu trabajo es encontrar el ángulo MÁS CREATIVO e
 inesperado, NO el obvio de reseñero. Un creador aburrido hace la pregunta predecible; tú haces algo

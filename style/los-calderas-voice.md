@@ -47,18 +47,20 @@ El gancho son los primeros 2 segundos: lo que dices o lo que la imagen muestra. 
 - ❌ "Hoy les voy a hablar de…" / "¿Sabías que…?" — PROHIBIDO, anuncia en vez de meterte en la situación.
 
 ## Vocabulario — SOLO español mexicano de CDMX
-USA: "nambre", "no manches", "o sea", "la neta", "básicamente", "wey", "la verdad es que", "te lo chismeo" (de Manuela), "te explico" (de Cristian).
+USA: "no manches", "o sea", "la neta", "wey", "la verdad es que", "a ver", "te lo chismeo" (de Manuela), "te explico" (de Cristian).
+EVITA "nambre" — ya se sobreusó, suena a muletilla. Búscale variedad a la apertura.
 NO USES (no son mexicanos): "candela" (venezolano), "chévere", "bacán", "parcero". Si dudas, no lo uses.
 
 ## Humor — fórmulas concretas
-El humor es ESPECÍFICO y anclado en algo real. Fórmulas que funcionan:
+El humor es ESPECÍFICO y anclado en algo real. Densidad alta: mete varios chistes, pero que cada uno también explique algo. Fórmulas que funcionan:
+- **Metáfora técnica con remate (chiste de dos tiempos)** — LA MÁS IMPORTANTE para explicar lo técnico. Planta una imagen cotidiana y haz que el REMATE haga callback a ESA MISMA imagen. No dos chistes sueltos; uno que se construye y se paga solo. Ej: "el motor es un clavadista que vive de respirar aire… hasta que le cae agua y se ahoga" (la imagen del clavadista se paga en "se ahogó", y de pasada explica el hydrolock). Otro: "los cables sellados como tupper para que no se salga el caldito".
 - **Autoburla** — ser becario ("becario, o más bien *precario*"), andar en el Swift con un Tesla en casa, su cambio físico, el café recalentado tres veces.
 - **El bit del Caldermóvil** — el Tesla de su papá, pedir permiso, que no lo cachen.
-- **Comparación absurda específica** — "tarda menos que tú decidiendo qué ver en Netflix".
-- **Referencia mexicana hiperlocal** — SHEINbaum, Periférico, Oxxo, el SAT, hacer el súper, topes.
+- **Comparación absurda específica** — "tarda menos que tú decidiendo qué ver en Netflix", "más cables que atrás de tu tele".
+- **Referencia mexicana hiperlocal** — SHEINbaum, Periférico, Oxxo, el SAT, hacer el súper, topes, el Olinia, la coca de piña del charco.
 - **Remate seco al final** — cerrar con una frase corta que sea el verdadero chiste ("una IA que maneja y otra que piensa").
 
-Reglas: el chiste "becario/precario" es oro, úsalo. Máximo una muletilla de impacto por video (si ya dijiste "nambre", ya no). NADA de chistes genéricos que funcionarían en cualquier canal, ni referencias inventadas.
+Reglas: el chiste "becario/precario" es oro, úsalo. Para explicar algo técnico SIEMPRE usa una metáfora cotidiana con remate, nunca el término a secas. NADA de chistes genéricos que funcionarían en cualquier canal, ni referencias inventadas.
 
 ## Modo Director — cómo se graba (estilo plática)
 Todo está pensado para grabar FÁCIL y editar poco:
@@ -75,10 +77,11 @@ Todo está pensado para grabar FÁCIL y editar poco:
 
 # Guiones de referencia (SOLO para el TONO — PROHIBIDO copiarlos)
 
-⚠️ Estos 5 son SOLO para que captures el **tono, el ritmo y cómo se mete el chiste**.
+⚠️ Estos son SOLO para que captures el **tono, el ritmo y cómo se mete el chiste**.
 **PROHIBIDO reusar su tema, su gancho o sus frases.** Si tu guión se parece a uno de estos —
 sobre todo al de "En mi casa hay un Tesla" o al de la batería — está MAL: recházalo y haz uno con
 un ángulo completamente distinto y más creativo. Son la vara de calidad, no plantillas para rellenar.
+El **Ref 6** es el estándar de oro de humor técnico: copia esa TÉCNICA (metáfora con remate), no su tema.
 
 ## Ref 1 — HOWTO · "Cargo el Tesla en plazas"
 - **Gancho:** "Llevo meses cargando el Tesla de mi papá y casi no lo siento en mi cartera."
@@ -104,3 +107,10 @@ un ángulo completamente distinto y más creativo. Son la vara de calidad, no pl
 - **Gancho:** "Mientras el Tesla maneja solo, te enseño la app que uso para no batallar: Claude."
 - **Cuerpo:** "Ya que el carro se maneja solo, yo aprovecho el tiempo. La herramienta que más uso es Claude —es como ChatGPT pero, la neta, más inteligente para lo que yo hago. Le puedo pedir que me resuma un documento de la chamba, que me explique un tema como si tuviera 5 años, o que me arme el plan de la semana. Todo mientras voy en el carro sin tocar el volante. Soy estudiante de ingeniería y becario de tecnología, y te lo digo: el que aprenda a usar bien estas IAs va a tener una ventaja enorme. No es trampa, es como tener un asistente que nunca duerme. Bueno, ya llegué. Hasta para llegar usé dos inteligencias artificiales: una que maneja y otra que piensa."
 - **CTA:** "Guarda esto y dime para qué quieres que use Claude en el próximo video."
+
+## Ref 6 — EL ESTÁNDAR DE ORO · "¿Qué mata primero a un carro ahogado?" (humor técnico aprobado por Isaac)
+Este es el nivel de humor técnico que Isaac quiere: explica algo de ingeniería con metáforas cotidianas, chistes de dos tiempos y densidad alta, pero cualquiera lo entiende. NO copies el tema, copia la TÉCNICA.
+- **Gancho:** "Vi los carros ahogados en Monterrey y como futuro ingeniero me puse a pensar: ¿qué los mata primero, el agua o la electrónica? Vente al gym y te explico."
+- **Cuerpo:** "A los dos se los carga el payaso, pero por razones distintas. El motor de gasolina es como un clavadista: vive de respirar aire antes de cada 'explosión'… hasta que le cae un trago de agua. El aire es codo y se deja aplastar, pero el agua es terca y no se comprime; el pistón baja esperando aire, se estampa contra el agua, y la biela —el bracito que conecta todo— se dobla como popote de Frutsi. Tu clavadista se ahogó: a eso los ingenieros le dicen hydrolock. Hola enganche de tu nuevo Olinia. El eléctrico es otra historia: la batería va sellada con certificación IP67, el mismo sello de tu celular que sobrevive el clavado al baño, un tupper de los buenos para que no se salga el caldito. El asesino real es que el carro es una tablet de medio millón con ruedas: si a los sensores y cablecitos les entra agua de la calle —con sal, tierra y tantita coca de piña, que sí conduce la electricidad— hace corto y se corroe por semanas. No muere de un infarto; muere como planta que se te olvidó regar: lento, triste y carísimo."
+- **CTA:** "Guarda esto para la próxima que veas un charco tamaño alberca… y mándaselo al valiente que dice 'yo sí paso'."
+- **Por qué funciona:** clavadista→se ahoga (chiste de dos tiempos), cada término técnico lleva su metáfora (IP67=celular al baño, sellado=tupper, electrónica=tablet con ruedas), remates mexicanos (Olinia, coca de piña), y enseña ingeniería real sin que se sienta clase.
