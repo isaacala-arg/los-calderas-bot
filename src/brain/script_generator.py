@@ -11,9 +11,11 @@ CONTEXTO_ACTUAL_PATH = os.path.join(_STYLE_DIR, "contexto-actual.md")
 
 # ─── INSTRUCCIONES COMUNES (DRY — se inyectan en todos los tipos) ──────────────
 _COMMON = """
-FORMATO: Reel vertical de 30 a 60 segundos. El campo "body" es el guión natural
-(lo que Isaac diría platicando, no un ensayo) y debe tener entre 90 y 170 palabras.
-Si tiene menos de 80 palabras, está incompleto.
+FORMATO: Reel vertical de 60 a 100 segundos. El campo "body" es el guión natural
+(lo que Isaac diría platicando, no un ensayo) y debe tener entre 200 y 320 palabras —
+suficiente material para que Isaac corte y adapte lo que quiera. Si tiene menos de 180
+palabras, está incompleto: desarrolla más el tema, agrega otro ejemplo, dato o remate.
+No lo rellenes con paja: cada oración debe enseñar algo o dar risa.
 
 REGLA DE ORO: el video tiene que ENSEÑAR algo útil Y dar risa. Si no cumple ambas, reescríbelo.
 
@@ -58,7 +60,7 @@ Responde SOLO con JSON válido (sin markdown, sin ```):
   "title": "título corto para Notion (máx 60 caracteres)",
   "topic_context": "qué enseña y por qué importa ahora, 1-2 oraciones",
   "hook": "los primeros 2 segundos, máximo 12 palabras, que pare el scroll",
-  "body": "guión natural completo, 90-170 palabras, con un momento de risa y algo que enseñe",
+  "body": "guión natural completo, 200-320 palabras, con varios momentos de risa y algo que enseñe; material de sobra para recortar",
   "cta": "cierre que sea el remate del chiste o invite a guardar/compartir; nunca 'dale like'",
   "spot": "lugar concreto y fácil donde grabarlo (de su contexto actual)",
   "como_grabar": "equipo + setup de una sola toma fácil (cel/DJI Mic/tripie/dron Neo)",
