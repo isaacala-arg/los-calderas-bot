@@ -1,10 +1,6 @@
 import json
-from google import genai
-from google.genai.errors import ServerError
-from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
+from src.brain import gemini_client
 from src.models import EvaluationResult
-
-_client = None
 
 _PROMPT = """
 Eres el curador de contenido para "Los Calderas", canal mexicano de autos y tecnología (TikTok/Reels/Shorts).
@@ -13,13 +9,14 @@ Sus autos: Tesla Model Y LR 2026, Mini Countryman JCW 2021, Suzuki Swift Sport 2
 Audiencia: mexicanos millennials/Gen Z, casual, que entienden de tech pero no son mecánicos.
 
 Tu trabajo: elegir las 3 noticias con más potencial de video viral para México.
-
+{trends_block}
 CRITERIOS DE SELECCIÓN (en este orden de prioridad):
 1. RELEVANCIA PARA MÉXICO primero — noticias que impactan directamente a conductores mexicanos (precios MXN, regulaciones SEP/SEMARNAT/SCT, marcas con presencia en México, tendencias virales en redes mexicanas)
 2. LATAM / NORTEAMÉRICA — noticias relevantes para la región que afecten a México próximamente
 3. GLOBAL — solo si el impacto es tan grande que México no puede ignorarlo (recall masivo, quiebra de marca, cambio tecnológico disruptivo)
 
 BONUS — elevar la puntuación si la noticia:
+- Coincide con una de las tendencias de búsqueda en México listadas arriba
 - Involucra vehículos eléctricos o híbridos en México → útil para comparar con el Tesla del creador
 - Es sobre tecnología automotriz (FSD, autonomía, carga) → perspectiva del creador como usuario real
 - Es viral en redes mexicanas o tiene >50k interacciones en México
@@ -41,25 +38,18 @@ Solo JSON, sin nada más.
 """
 
 
-def _get_client():
-    global _client
-    if _client is None:
-        from src.config import settings
-        _client = genai.Client(api_key=settings.GEMINI_API_KEY)
-    return _client
+def _build_trends_block(trends: list | None) -> str:
+    """Formatea las tendencias de Google México para inyectar al prompt."""
+    if not trends:
+        return ""
+    lines = "\n".join(f"- {t['keyword']} (interés: {t['interest']})" for t in trends[:5])
+    return (
+        "\nTENDENCIAS DE BÚSQUEDA EN MÉXICO AHORA MISMO (úsalas para priorizar):\n"
+        f"{lines}\n"
+    )
 
 
-@retry(
-    stop=stop_after_attempt(3),
-    wait=wait_fixed(60),
-    retry=retry_if_exception_type(ServerError),
-    reraise=True,
-)
-def _call_gemini(client, model: str, contents: str):
-    return client.models.generate_content(model=model, contents=contents)
-
-
-def evaluate(articles: list) -> EvaluationResult:
+def evaluate(articles: list, trends: list | None = None) -> EvaluationResult:
     if not articles:
         return EvaluationResult(
             top_articles=[], urgent_article=None,
@@ -71,10 +61,11 @@ def evaluate(articles: list) -> EvaluationResult:
         for i, a in enumerate(articles)
     )
 
-    client = _get_client()
-    response = _call_gemini(
-        client, "gemini-2.5-flash", _PROMPT.format(articles_text=articles_text)
+    prompt = _PROMPT.format(
+        articles_text=articles_text,
+        trends_block=_build_trends_block(trends),
     )
+    response = gemini_client.call(prompt)
     raw = response.text.strip()
     if raw.startswith("```"):
         raw = raw.split("```")[1]

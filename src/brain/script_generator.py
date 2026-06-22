@@ -1,18 +1,9 @@
 import json
 import os
 import random
-from datetime import datetime
-from google import genai
-from google.genai import types
-from google.genai.errors import ServerError
-from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
+from datetime import datetime, timezone
+from src.brain import gemini_client
 from src.models import Article, Script
-
-_SEARCH_CONFIG = types.GenerateContentConfig(
-    tools=[types.Tool(google_search=types.GoogleSearch())]
-)
-
-_client = None
 
 VOICE_GUIDE_PATH = os.path.join(os.path.dirname(__file__), "../../style/los-calderas-voice.md")
 
@@ -341,24 +332,6 @@ _OPINION_TOPICS = [
 ]
 
 
-def _get_client():
-    global _client
-    if _client is None:
-        from src.config import settings
-        _client = genai.Client(api_key=settings.GEMINI_API_KEY)
-    return _client
-
-
-@retry(
-    stop=stop_after_attempt(3),
-    wait=wait_fixed(60),
-    retry=retry_if_exception_type(ServerError),
-    reraise=True,
-)
-def _call_gemini(client, model: str, contents: str, config=None):
-    return client.models.generate_content(model=model, contents=contents, config=config)
-
-
 def _to_str(value) -> str:
     """Gemini sometimes returns lists instead of strings — join them."""
     if isinstance(value, list):
@@ -397,9 +370,16 @@ def _parse_response(response, script_type: str) -> Script:
     )
 
 
+_voice_guide_cache = {}
+
+
 def _load_voice_guide() -> str:
-    with open(VOICE_GUIDE_PATH, "r", encoding="utf-8") as f:
-        return f.read()
+    # Cacheado por ruta: el voice guide no cambia durante una corrida
+    # (antes se leía del disco 3 veces por ejecución del generador)
+    if VOICE_GUIDE_PATH not in _voice_guide_cache:
+        with open(VOICE_GUIDE_PATH, "r", encoding="utf-8") as f:
+            _voice_guide_cache[VOICE_GUIDE_PATH] = f.read()
+    return _voice_guide_cache[VOICE_GUIDE_PATH]
 
 
 _IMPACT_EXPRESSIONS = ["nambre", "no manches", "o sea", "básicamente", "espérense", "la verdad es que", "a ver si"]
@@ -454,10 +434,9 @@ def generate(article: Article, script_type: str = "trend", canal_context: str = 
     )
     if canal_context:
         prompt += f"\n\n---\n\nCONTEXTO DEL CANAL:\n{canal_context}"
-    client = _get_client()
     # Search grounding only for trend — howto/lifestyle/opinion use pre-defined topics
-    config = _SEARCH_CONFIG if script_type in ("trend", "evergreen") else None
-    response = _call_gemini(client, "gemini-2.5-flash", prompt, config=config)
+    config = gemini_client.SEARCH_CONFIG if script_type in ("trend", "evergreen") else None
+    response = gemini_client.call(prompt, config=config)
     return _parse_response(response, script_type)
 
 
@@ -468,7 +447,7 @@ def generate_howto(canal_context: str = "") -> Script:
         url="",
         summary=topic["context"],
         source="howto",
-        published=datetime.utcnow(),
+        published=datetime.now(timezone.utc),
     )
     return generate(article, script_type="howto", canal_context=canal_context)
 
@@ -480,7 +459,7 @@ def generate_lifestyle(canal_context: str = "") -> Script:
         url="",
         summary=topic["context"],
         source="lifestyle",
-        published=datetime.utcnow(),
+        published=datetime.now(timezone.utc),
     )
     return generate(article, script_type="lifestyle", canal_context=canal_context)
 
@@ -492,7 +471,7 @@ def generate_opinion(canal_context: str = "") -> Script:
         url="",
         summary=topic["context"],
         source="opinion",
-        published=datetime.utcnow(),
+        published=datetime.now(timezone.utc),
     )
     return generate(article, script_type="opinion", canal_context=canal_context)
 

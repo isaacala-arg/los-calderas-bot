@@ -1,7 +1,8 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from src.models import Article
 from src.brain import script_generator as sg
+from src.brain import gemini_client
 
 
 def _make_article():
@@ -10,7 +11,7 @@ def _make_article():
         url="https://example.com",
         summary="Tesla anunció que FSD estará disponible en México...",
         source="Electrek",
-        published=datetime.utcnow(),
+        published=datetime.now(timezone.utc),
     )
 
 
@@ -34,9 +35,10 @@ def _patch_client(mocker, tmp_path, script_type="trend"):
     voice_file = tmp_path / "los-calderas-voice.md"
     voice_file.write_text("# Voz del canal\nTono casual mexicano.")
     mocker.patch("src.brain.script_generator.VOICE_GUIDE_PATH", str(voice_file))
+    sg._voice_guide_cache = {}  # limpiar cache entre tests
     mock_client = mocker.MagicMock()
     mock_client.models.generate_content.return_value.text = _mock_script_json(script_type)
-    sg._client = mock_client
+    gemini_client._client = mock_client
     return mock_client
 
 

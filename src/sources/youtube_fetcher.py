@@ -1,5 +1,5 @@
 import googleapiclient.discovery
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from src.models import Article
 
 SEARCH_QUERIES = [
@@ -16,7 +16,7 @@ def fetch_trending(max_results: int = 5) -> list:
 
     youtube = googleapiclient.discovery.build("youtube", "v3", developerKey=settings.YOUTUBE_API_KEY)
     articles = []
-    published_after = (datetime.utcnow() - timedelta(days=3)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    published_after = (datetime.now(timezone.utc) - timedelta(days=3)).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     for query in SEARCH_QUERIES:
         response = youtube.search().list(

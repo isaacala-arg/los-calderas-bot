@@ -1,5 +1,5 @@
 import praw
-from datetime import datetime
+from datetime import datetime, timezone
 from src.models import Article
 
 SUBREDDITS = ["cars", "teslamotors", "electricvehicles", "Autos", "CarTalk"]
@@ -26,6 +26,6 @@ def fetch_posts(limit: int = 10) -> list:
                     url=f"https://reddit.com{post.permalink}",
                     summary=(post.selftext[:500] if post.selftext else post.title),
                     source=f"r/{sub_name}",
-                    published=datetime.utcfromtimestamp(post.created_utc),
+                    published=datetime.fromtimestamp(post.created_utc, timezone.utc),
                 ))
     return articles

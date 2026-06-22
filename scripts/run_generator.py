@@ -14,12 +14,22 @@ from src.outputs.notion_writer import write_script
 from src.outputs.notion_reader import get_recent_titles, get_approved_examples
 
 
+def _safe(label, fn, default):
+    """Ejecuta un fetcher sin que un fallo (RSS caído, pytrends bloqueado)
+    tumbe toda la generación. Devuelve `default` si truena."""
+    try:
+        return fn()
+    except Exception as e:
+        print(f"  ⚠️  {label} falló ({type(e).__name__}: {e}) — continuando sin eso")
+        return default
+
+
 def main():
     # Load canal context first so the generator avoids repeating topics
     # and learns from scripts Isaac has already approved
     print("Cargando contexto del canal desde Notion...")
-    recent_titles = get_recent_titles(days=45)
-    approved_examples = get_approved_examples(limit=4)
+    recent_titles = _safe("Notion títulos", lambda: get_recent_titles(days=45), [])
+    approved_examples = _safe("Notion aprobados", lambda: get_approved_examples(limit=4), [])
     canal_context = build_canal_context(recent_titles, approved_examples)
     if recent_titles:
         print(f"  {len(recent_titles)} temas recientes cargados (para no repetir)")
@@ -28,16 +38,18 @@ def main():
 
     print("Fetching articles from all sources...")
     articles = (
-        fetch_articles(max_per_feed=5)
-        + fetch_posts(limit=10)
-        + fetch_trending(max_results=5)
+        _safe("RSS", lambda: fetch_articles(max_per_feed=5), [])
+        + _safe("Reddit", lambda: fetch_posts(limit=10), [])
+        + _safe("YouTube", lambda: fetch_trending(max_results=5), [])
     )
 
-    trends = fetch_trends()
-    print(f"Top trends: {[t['keyword'] for t in trends[:3]]}")
+    trends = _safe("Google Trends", fetch_trends, [])
+    if trends:
+        print(f"Top trends: {[t['keyword'] for t in trends[:3]]}")
     print(f"Total articles collected: {len(articles)}")
 
-    result = evaluate(articles)
+    # Trends alimentan al evaluador para priorizar lo que se busca en México ahora
+    result = evaluate(articles, trends=trends)
 
     # Script 1: trend — from the top news article of the day
     if result.top_articles:

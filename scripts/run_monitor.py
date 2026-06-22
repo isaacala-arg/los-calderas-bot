@@ -15,21 +15,29 @@ SEEN_URLS_PATH = os.path.join(
 )
 
 
-def load_seen_urls() -> set:
+# Máximo de URLs a recordar — evita que seen_urls.json crezca infinitamente.
+# Se conservan las más recientes (orden de inserción).
+MAX_SEEN_URLS = 500
+
+
+def load_seen_urls() -> list:
     if os.path.exists(SEEN_URLS_PATH):
         with open(SEEN_URLS_PATH, encoding="utf-8") as f:
-            return set(json.load(f))
-    return set()
+            return list(json.load(f))
+    return []
 
 
-def save_seen_urls(urls: set) -> None:
+def save_seen_urls(urls: list) -> None:
     os.makedirs(os.path.dirname(SEEN_URLS_PATH), exist_ok=True)
+    # Conservar solo las últimas MAX_SEEN_URLS
+    trimmed = urls[-MAX_SEEN_URLS:]
     with open(SEEN_URLS_PATH, "w", encoding="utf-8") as f:
-        json.dump(list(urls), f, indent=2)
+        json.dump(trimmed, f, indent=2)
 
 
 def main():
-    seen = load_seen_urls()
+    seen_list = load_seen_urls()
+    seen = set(seen_list)
     articles = fetch_articles(max_per_feed=3) + fetch_posts(limit=5)
     new_articles = [a for a in articles if a.url not in seen]
 
@@ -39,19 +47,21 @@ def main():
 
     result = evaluate(new_articles)
 
+    # SIEMPRE marcar todo lo nuevo como visto — así no se re-evalúa en Gemini
+    # en la siguiente corrida (antes solo se marcaba la urgente: gasto de tokens).
+    for a in new_articles:
+        if a.url not in seen:
+            seen.add(a.url)
+            seen_list.append(a.url)
+
     if result.urgency_score >= 7 and result.urgent_article:
         article = result.urgent_article
-        if article.url not in seen:
-            send_alert(article, result.urgency_score, result.urgency_reasoning)
-            seen.add(article.url)
-            save_seen_urls(seen)
-            print(f"Alert sent: {article.title}")
-        else:
-            print("Urgent article already alerted — skipping.")
+        send_alert(article, result.urgency_score, result.urgency_reasoning)
+        print(f"Alert sent: {article.title}")
     else:
-        seen.update(a.url for a in new_articles)
-        save_seen_urls(seen)
         print(f"No urgent news. Urgency score: {result.urgency_score}/10")
+
+    save_seen_urls(seen_list)
 
 
 if __name__ == "__main__":

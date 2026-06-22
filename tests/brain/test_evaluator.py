@@ -1,7 +1,8 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from src.models import Article
 from src.brain import evaluator as ev
+from src.brain import gemini_client
 
 
 def _make_article(title="Test article"):
@@ -10,7 +11,7 @@ def _make_article(title="Test article"):
         url="https://example.com",
         summary="Summary of the article",
         source="Test Source",
-        published=datetime.utcnow(),
+        published=datetime.now(timezone.utc),
     )
 
 
@@ -33,7 +34,7 @@ def test_returns_top_articles(mocker):
 
     mock_client = mocker.MagicMock()
     mock_client.models.generate_content.return_value.text = gemini_response
-    ev._client = mock_client
+    gemini_client._client = mock_client
 
     result = ev.evaluate(articles)
 
@@ -54,7 +55,7 @@ def test_returns_urgent_article_when_score_high(mocker):
 
     mock_client = mocker.MagicMock()
     mock_client.models.generate_content.return_value.text = gemini_response
-    ev._client = mock_client
+    gemini_client._client = mock_client
 
     result = ev.evaluate(articles)
 

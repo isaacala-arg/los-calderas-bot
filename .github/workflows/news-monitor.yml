@@ -2,7 +2,8 @@ name: News Monitor
 
 on:
   schedule:
-    - cron: "0 * * * *"   # cada hora (mantiene el tier gratuito de GitHub Actions)
+    - cron: "0 */4 * * *"   # cada 4 horas (6 veces/día) — balance entre detectar
+                            # noticias urgentes y ahorrar créditos de Gemini
   workflow_dispatch:
 
 permissions:
