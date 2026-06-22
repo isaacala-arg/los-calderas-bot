@@ -6,8 +6,13 @@ from google.genai import types
 from google.genai.errors import ServerError
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 
-# Modelo por defecto. Cambiar aquí lo cambia en todo el proyecto.
-MODEL = "gemini-2.5-flash"
+# Modelos. FLASH = rápido y barato para tareas mecánicas (evaluar noticias,
+# investigar). PRO = más inteligente para escribir guiones con humor y tono.
+MODEL_FLASH = "gemini-2.5-flash"
+MODEL_PRO = "gemini-2.5-pro"
+
+# Default para compatibilidad: tareas mecánicas usan flash.
+MODEL = MODEL_FLASH
 
 # Config de búsqueda en Google (grounding). Solo para contenido que necesita
 # datos actuales de internet — NO para temas del banco interno.

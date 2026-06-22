@@ -17,16 +17,18 @@ def _make_article():
 
 def _mock_script_json(script_type="trend"):
     return json.dumps({
-        "title": "Semana sin tocar el volante",
-        "topic_context": "FSD en CDMX, prueba real de 5 días",
-        "hook": "No manches... llevo cinco días sin tocar esto",
-        "body": "Todo empezó el lunes cuando decidí activar el FSD...",
-        "cta": "Guarda esto para cuando alguien te diga que los eléctricos no sirven en México",
-        "visual_idea": "Cámara fija desde asiento trasero. Tú leyendo un libro. El volante girando solo.",
-        "filming_tips": ["Empieza con el libro en el asiento trasero, sin hablar, 2 segundos", "Muestra la pantalla del carro al dar el dato"],
-        "hashtags_tiktok": ["#Tesla", "#FSD", "#AutosElectricos", "#Mexico", "#TeslaMexico"],
-        "hashtags_reels": ["#Tesla", "#FSD", "#AutosElectricosMexico"],
-        "hashtags_shorts": ["#Tesla", "#FSD", "#Mexico"],
+        "title": "Cargo el Tesla en plazas",
+        "topic_context": "Cuánto cuesta cargar el Caldermóvil en CDMX",
+        "hook": "Llevo meses cargando el Tesla de mi papá",
+        "body": "Todos me preguntan cuánto sube el recibo de luz...",
+        "cta": "Guarda esto para cuando alguien jure que un eléctrico te deja en quiebra",
+        "spot": "En la plaza, junto al Tesla conectado al cargador",
+        "como_grabar": "Cel en el tripie + DJI Mic. Una sola toma señalando el cargador",
+        "puntos": ["La duda real del recibo", "No en casa, en plazas", "Remate del súper"],
+        "arranque": "Señalas el cargador y dices: 'Llevo meses cargando el Tesla de mi papá...'",
+        "hashtags_tiktok": ["#Tesla", "#FSD", "#Mexico"],
+        "hashtags_reels": ["#Tesla", "#AutosElectricos"],
+        "hashtags_shorts": ["#Tesla", "#Mexico"],
         "script_type": script_type,
     })
 
@@ -35,7 +37,7 @@ def _patch_client(mocker, tmp_path, script_type="trend"):
     voice_file = tmp_path / "los-calderas-voice.md"
     voice_file.write_text("# Voz del canal\nTono casual mexicano.")
     mocker.patch("src.brain.script_generator.VOICE_GUIDE_PATH", str(voice_file))
-    sg._voice_guide_cache = {}  # limpiar cache entre tests
+    sg._file_cache = {}  # limpiar cache de archivos entre tests
     mock_client = mocker.MagicMock()
     mock_client.models.generate_content.return_value.text = _mock_script_json(script_type)
     gemini_client._client = mock_client
@@ -45,11 +47,19 @@ def _patch_client(mocker, tmp_path, script_type="trend"):
 def test_generate_trend_returns_script(mocker, tmp_path):
     _patch_client(mocker, tmp_path, "trend")
     script = sg.generate(_make_article(), script_type="trend")
-    assert script.hook == "No manches... llevo cinco días sin tocar esto"
+    assert script.hook == "Llevo meses cargando el Tesla de mi papá"
     assert script.script_type == "trend"
     assert len(script.hashtags_tiktok) > 0
-    assert script.visual_idea != ""
-    assert isinstance(script.filming_tips, list)
+    assert script.spot != ""
+    assert script.arranque != ""
+    assert isinstance(script.puntos, list) and len(script.puntos) > 0
+
+
+def test_generate_uses_pro_model(mocker, tmp_path):
+    mock = _patch_client(mocker, tmp_path, "howto")
+    sg.generate(_make_article(), script_type="howto")
+    kwargs = mock.models.generate_content.call_args[1]
+    assert kwargs["model"] == gemini_client.MODEL_PRO
 
 
 def test_generate_howto_returns_script(mocker, tmp_path):
@@ -63,17 +73,28 @@ def test_generate_howto_returns_script(mocker, tmp_path):
 def test_generate_lifestyle_returns_script(mocker, tmp_path):
     _patch_client(mocker, tmp_path, "lifestyle")
     script = sg.generate_lifestyle()
-    assert script is not None
-    assert script.hook != ""
     assert script.script_type == "lifestyle"
+    assert script.como_grabar != ""
 
 
 def test_generate_opinion_returns_script(mocker, tmp_path):
     _patch_client(mocker, tmp_path, "opinion")
     script = sg.generate_opinion()
-    assert script is not None
-    assert script.hook != ""
     assert script.script_type == "opinion"
+
+
+def test_generate_tech_returns_script(mocker, tmp_path):
+    _patch_client(mocker, tmp_path, "tech")
+    script = sg.generate_tech()
+    assert script.script_type == "tech"
+    assert script.hook != ""
+
+
+def test_generate_fsd_returns_script(mocker, tmp_path):
+    _patch_client(mocker, tmp_path, "fsd")
+    script = sg.generate_fsd()
+    assert script.script_type == "fsd"
+    assert script.hook != ""
 
 
 def test_generate_evergreen_returns_script(mocker, tmp_path):
@@ -81,3 +102,16 @@ def test_generate_evergreen_returns_script(mocker, tmp_path):
     script = sg.generate_evergreen()
     assert script is not None
     assert script.hook != ""
+
+
+def test_contexto_actual_injected_into_prompt(mocker, tmp_path):
+    mock = _patch_client(mocker, tmp_path, "howto")
+    mocker.patch("src.brain.script_generator.CONTEXTO_ACTUAL_PATH", str(tmp_path / "ctx.md"))
+    (tmp_path / "ctx.md").write_text("VACACIONES hasta el 15 de agosto. NO menciones la escuela.")
+    sg._file_cache = {}
+    # re-patch voice after cache clear
+    voice_file = tmp_path / "los-calderas-voice.md"
+    mocker.patch("src.brain.script_generator.VOICE_GUIDE_PATH", str(voice_file))
+    sg.generate_howto()
+    prompt = mock.models.generate_content.call_args[1]["contents"]
+    assert "VACACIONES hasta el 15 de agosto" in prompt

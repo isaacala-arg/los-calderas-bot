@@ -29,19 +29,15 @@ def write_script(script: Script) -> str:
             _p(script.topic_context),
             _h2("🎣 Gancho (0–3 seg)"),
             _p(script.hook),
-            _h2("📖 Cuerpo (40–75 seg)"),
+            _h2("📖 Guión (platícalo, no lo leas)"),
             _p(script.body),
             _h2("📣 Cierre / CTA"),
             _p(script.cta),
-            _h2("🎬 Idea Visual"),
-            _p(script.visual_idea),
-            _h2("🎬 Consejos de grabación"),
-            *[_bullet(tip) for tip in script.filming_tips],
+            *_modo_director_section(script),
             _h2("Hashtags"),
             _p(f"TikTok: {' '.join(script.hashtags_tiktok)}"),
             _p(f"Reels: {' '.join(script.hashtags_reels)}"),
             _p(f"Shorts: {' '.join(script.hashtags_shorts)}"),
-            *_teleprompter_section(script),
         ],
     )
     return response["url"]
@@ -63,20 +59,30 @@ def _p(text: str) -> dict:
     }
 
 
-def _teleprompter_section(script) -> list:
-    if script.script_type == "lifestyle":
-        return [
-            _h2("🎬 PLAN DE ESCENAS — improvisar en cámara"),
-            _p(script.body),
-        ]
-    return [
-        _h2("📱 TELEPROMPTER — copia y lee"),
-        _p(f"{script.hook}\n\n{script.body}\n\n{script.cta}"),
-    ]
+def _modo_director_section(script) -> list:
+    """Sección 🎬 MODO DIRECTOR: cómo grabarlo fácil, estilo plática."""
+    blocks = [_h2("🎬 MODO DIRECTOR — cómo grabarlo")]
+    if script.arranque:
+        blocks += [_bold_line("Arranque (textual):"), _p(script.arranque)]
+    if script.spot:
+        blocks += [_bold_line("Spot:"), _p(script.spot)]
+    if script.como_grabar:
+        blocks += [_bold_line("Cómo grabarlo:"), _p(script.como_grabar)]
+    if script.puntos:
+        blocks.append(_bold_line("Plática — toca estos puntos con tus palabras:"))
+        blocks += [_bullet(p) for p in script.puntos]
+    return blocks
 
 
 def _bullet(text: str) -> dict:
     return {
         "object": "block", "type": "bulleted_list_item",
-        "bulleted_list_item": {"rich_text": [{"text": {"content": text}}]},
+        "bulleted_list_item": {"rich_text": [{"text": {"content": str(text)[:2000]}}]},
+    }
+
+
+def _bold_line(text: str) -> dict:
+    return {
+        "object": "block", "type": "paragraph",
+        "paragraph": {"rich_text": [{"text": {"content": str(text)[:2000]}, "annotations": {"bold": True}}]},
     }

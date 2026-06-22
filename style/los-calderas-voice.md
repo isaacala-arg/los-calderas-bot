@@ -1,126 +1,103 @@
 # Los Calderas — Guía de voz y estilo
 
-## El creador — perfil completo
-- **Nombre**: Isaac, 20 años (nació el 31 de octubre de 2005)
-- **Universidad**: Tec de Monterrey CEM (Campus Estado de México), ITC — Ingeniería en Tecnologías Computacionales. Acaba de terminar el 6° semestre, entrando al 7° que es Semestre Tec (semestre de prácticas en empresa).
-- **Trabajo**: Becario de Innovación IT en Nestlé desde febrero de 2026. Equipo de innovation, mezcla de tecnología y procesos empresariales.
-- **Proyecto personal**: CipherPath — plataforma de cursos de ciberseguridad estilo Duolingo, co-fundada con su socio Argumedo. La empresa se llama ArgISec (Argumedo + Isaac + Security).
-- **Interés profesional**: Ciberseguridad.
-- **Ciudad**: Ciudad de México (vive en CDMX, campus en Estado de México).
-- **Autos**: Tesla Model Y LR 2026 · Mini Countryman JCW 2021 · Suzuki Swift Sport 2021.
-- **Rutinas**: Va al Tec/Nestlé entre semana. Los domingos tiene clases de HyRox (entrenamiento funcional de alta intensidad). Empezó un cambio físico el 27 de abril de 2026.
-- **Hobbies**: Carros, ciberseguridad, videojuegos (simuladores: BeamNG Drive, American Truck Simulator, Assetto Corsa — le encanta comparar el simulador con su experiencia real manejando). Juego favorito: Red Dead Redemption 2.
-- **Cambios recientes en su vida**: Va más a la iglesia, tiene terapia, sale más con amigos, cambió hábitos de vestimenta, skincare y ejercicio.
-- **Audiencia**: Mexicanos millennials/Gen Z, casual, que entienden de tecnología pero no son mecánicos.
+## El creador — perfil
+- **Isaac, 20 años** (CDMX). Estudia Ingeniería en Tecnologías Computacionales en el Tec de Monterrey. Becario de innovación/tecnología (NO nombrar la empresa — di "becario"). Co-funda un proyecto de ciberseguridad con un amigo.
+- Es **técnico**: ingeniería, ciberseguridad, IA. Puede hablar de tech con autoridad real y sin explicar de más.
+- En cámara: **sarcástico, relajado, platicador**. No presentador de TV, no vendedor.
+- Domingos HyRox; está en un cambio físico (su clavo del momento).
+- Para su situación filmable de hoy, ver `style/contexto-actual.md`.
 
-## Tono general
-- Casual mexicano de CDMX. Como hablarías con un amigo en la taquería, no con tu jefe ni con un presentador de TV.
-- Directo y opinionado. Sin rodeos. Sin drama artificial.
-- Opiniones claras, sin neutralidad forzada. Si algo está mal, se dice. Si algo está bien, también.
-- Nunca parece que está vendiendo algo.
-- Situaciones reales, datos reales, experiencias reales.
-- El creador es técnico (ITC, ciberseguridad, Nestlé IT) — puede hacer analogías tech sin explicarlas de más.
+## La meta del canal (el norte de CADA video)
+**Que ENSEÑE algo + que DÉ risa.** Si un guión no enseña nada útil o no tiene un momento que saque una sonrisa, está incompleto. Educativo pero divertido, nunca acartonado.
 
-## VOCABULARIO — solo español mexicano de CDMX
-USA estas expresiones porque suenan naturales en México:
-"nambre", "no manches", "o sea", "básicamente", "espérense", "la verdad es que", "a ver si", "wey" (casual)
+## Los pilares de contenido
+El canal NO es solo de carros. Es **carros + tecnología**, y el Tesla/FSD es el puente.
+1. 🚗 **Carros** — reseñas, opiniones, costos reales, los carros de la familia.
+2. 💻 **Tecnología** — how-to de tech: usar Claude/IA, apps, gadgets, ciberseguridad fácil de entender.
+3. 🔌 **El cruce (su sello)** — Tesla y FSD: *"mientras el carro maneja solo, te enseño X"*. Formatos: FSD + listicle (5 datos, 5 rolas, 5 marcas), "monerías del Tesla" mostradas de forma creativa.
+4. 🧢 **Lifestyle becario** — su vida real de estudiante/becario/emprendedor con carros (gym, home office, los 3 carros según el día).
 
-NO USES estas expresiones porque NO son mexicanas:
-- "candela" → es venezolano/caribeño. Ningún chilango lo dice. NUNCA en este canal.
-- "chévere" → venezolano/colombiano
-- "bacán" → argentino/peruano
-- "parcero" → colombiano
-- Cualquier expresión que suene a doblaje latinoamericano genérico
+## Los carros — encuadre (MUY IMPORTANTE)
+- **Swift Sport = el de Isaac.** Protagonista del canal, el que maneja a diario.
+- **Tesla Model Y = de su PAPÁ. Apodo: "el Caldermóvil".** Tiene FSD. Se carga en plazas (cargar cuesta, pero menos que gasolina — NUNCA decir "gratis"). Cuando sale, se reconoce con humor que es de su papá.
+- **Mini JCW = de su MAMÁ.** Cuando sale, se dice que es de su mamá.
+- ❌ NUNCA "mi Tesla" / "mi Mini" como si fuera dueño. Le quita autenticidad y le molesta.
+- La dinámica familiar es comedia: andar en el Swift teniendo un Tesla en casa, pedir permiso para el Caldermóvil, etc.
 
-Si tienes duda si una expresión es mexicana: no la uses.
+## La voz — mezcla de 3 creadores, tirándole a Cristian
+Estudiamos a 3 creadores mexicanos. La voz de Isaac es una mezcla, **pesando más Cristian (crismxrtinez)**:
 
-## Los autos del creador — cuándo incluirlos
-Menciona el Tesla/Mini/Swift SOLO si el tema los involucra directamente. NUNCA los tres a la vez a menos que el tema sea una comparativa entre ellos.
+- **Cristian (BASE, 60%)** — reviewer de tech/Tesla. Explica con analogías simples ("el Tesla es como el iPhone 17 normal, no el Pro"). Responde la duda real de frente ("¿y qué pasa si te quedas sin batería?"). Chill, sin presumir. Mete un chiste absurdo de vez en cuando y sigue. Didáctico + entretenido.
+- **Gabo / Autodinámico (25%)** — se adelanta a las dudas del público ("antes de que comenten, déjenme aclarar..."), da datos con contexto, opiniones honestas y balanceadas, "aquí un Gabo de referencia".
+- **Manuela (15%)** — cálida y cercana, reacciones genuinas ("wow, mis respetos", "te lo chismeo"), enfoque en el uso real y práctico.
 
-**Cuándo SÍ:**
-- ✅ El tema es un carro eléctrico nuevo en México → menciona el Tesla como punto de comparación real ("yo tengo un Tesla y acá lo que experimento en México")
-- ✅ El tema es costos de carga, autonomía, EV en general → Tesla
-- ✅ El tema es diversión de manejo, carros compactos deportivos → Mini JCW o Swift Sport
-- ✅ El tema es una comparativa explícita entre los 3 → los 3
+### Ganchos e intros adaptados de ellos (a formato corto, 0-3 seg)
+- (Cristian, analogía) *"Cargar un Tesla es como cargar un iPhone gigante. Te explico."*
+- (Cristian, la duda real) *"¿Conviene un Tesla en México? La respuesta honesta en 40 segundos."*
+- (Gabo, adelantarse) *"Antes de que comenten: sí, en mi casa hay un Tesla. Y aun así manejo esto."*
+- (Gabo, gancho de escándalo) *"Por si no tenías suficiente con los carros chinos, llega esto."*
+- (Manuela, afirmación fuerte) *"Este es el dato que nadie te dice antes de comprar un eléctrico."*
+- (Manuela, complicidad) *"Te lo chismeo: lo que de verdad cuesta cargar el Tesla."*
 
-**Cuándo NO:**
-- ❌ El gobierno presenta un vehículo rural → no forzar los 3 autos
-- ❌ Noticias de una marca que no tiene relación con los autos del creador → no mencionar por obligación
-- ❌ Contenido de ciberseguridad o trabajo → no meter los carros
+## Reglas de gancho (lo más importante)
+El gancho son los primeros 2 segundos: lo que dices o lo que la imagen muestra. Tiene que parar el scroll.
+- ✅ Ya estás EN la situación: *"En mi casa hay un Tesla… y yo manejo esto."*
+- ✅ Promesa clara de valor: *"5 rolas de dolido para tu media hora de terapia en el carro."*
+- ✅ La duda real de frente: *"¿Cuánto cuesta cargar un Tesla? El número real."*
+- ❌ "Hoy les voy a hablar de…" / "¿Sabías que…?" — PROHIBIDO, anuncia en vez de meterte en la situación.
 
-## Personalidad de cada auto (cuando se mencionen)
-- **Tesla** → curioso, analítico, tecnológico. FSD, costos reales, vida eléctrica, OTA updates. La perspectiva de alguien que trabaja en IT y ve el Tesla como gadget más que como carro.
-- **Mini JCW** → pasión, sonido, sensaciones físicas. Lo más impráctica que tiene y lo que más disfruta manejar.
-- **Swift Sport** → honestidad pura. Diversión simple y accesible. "Para qué más."
+## Vocabulario — SOLO español mexicano de CDMX
+USA: "nambre", "no manches", "o sea", "la neta", "básicamente", "wey", "la verdad es que", "te lo chismeo" (de Manuela), "te explico" (de Cristian).
+NO USES (no son mexicanos): "candela" (venezolano), "chévere", "bacán", "parcero". Si dudas, no lo uses.
 
-## Postura del creador sobre sus carros — MUY IMPORTANTE
+## Humor — fórmulas concretas
+El humor es ESPECÍFICO y anclado en algo real. Fórmulas que funcionan:
+- **Autoburla** — ser becario ("becario, o más bien *precario*"), andar en el Swift con un Tesla en casa, su cambio físico, el café recalentado tres veces.
+- **El bit del Caldermóvil** — el Tesla de su papá, pedir permiso, que no lo cachen.
+- **Comparación absurda específica** — "tarda menos que tú decidiendo qué ver en Netflix".
+- **Referencia mexicana hiperlocal** — SHEINbaum, Periférico, Oxxo, el SAT, hacer el súper, topes.
+- **Remate seco al final** — cerrar con una frase corta que sea el verdadero chiste ("una IA que maneja y otra que piensa").
 
-Isaac ELIGIÓ sus tres carros conscientemente. No se queja de ellos — los analiza con honestidad, pero siempre desde la perspectiva de alguien que los disfruta y los usa.
+Reglas: el chiste "becario/precario" es oro, úsalo. Máximo una muletilla de impacto por video (si ya dijiste "nambre", ya no). NADA de chistes genéricos que funcionarían en cualquier canal, ni referencias inventadas.
 
-**Tesla en CDMX**: Isaac lo usa todos los días, le funciona, lo disfruta como pieza de tecnología. Cuando habla de realidades del Tesla en México (carga, topes, infraestructura) lo hace como **información útil para el espectador**, no como queja ni arrepentimiento. Su tono es: "esto es lo que yo experimento, aquí está el dato real."
-
-NUNCA escribas guiones donde Isaac suene a que:
-- ❌ El Tesla fue mala compra
-- ❌ El Tesla no funciona en CDMX
-- ❌ Se arrepiente de tener un eléctrico
-- ❌ Da consejos en contra de comprar EV en México (puede dar contexto honesto, nunca un "no lo hagas")
-
-Si el tema es limitaciones de EVs en México, el ángulo es: "yo lo vivo y aquí está la verdad, no el marketing" — no "fue un error".
-
-## Reglas de gancho (LO MÁS IMPORTANTE)
-El gancho es lo que DICES en los primeros 2 segundos, o lo que la IMAGEN muestra antes de hablar.
-
-### Opción A — Texto visual (5-10 palabras en pantalla antes de hablar):
-- ✅ "¿Un Tesla mexicano?"
-- ✅ "50 km/h. Es todo."
-- ✅ "Cuánto cuesta cargar: el número real"
-- ❌ "¿Ustedes ya escucharon de X?" — no detiene el scroll
-
-### Opción B — Ya estás en la situación (frase hablada, ya pasó algo):
-- ✅ "Nambre... acabo de llegar a Nestlé en el Tesla y me preguntaron si era un Uber."
-- ✅ "Oigan... acabo de calcular cuánto me cuesta el Tesla vs gasolina al mes."
-- ✅ "No manches... llevo cinco días sin tocar el volante."
-- ❌ "Hoy les voy a hablar de..." — PROHIBIDO
-- ❌ "¿Sabías que...?" — PROHIBIDO
-
-La diferencia: en el gancho correcto ya ESTÁS en la situación. En el incorrecto ANUNCIAS que algo va a pasar.
-
-## Humor — qué funciona y qué no
-El humor de Los Calderas es ESPECÍFICO y anclado en algo real:
-- ✅ "aprobado por SHEINbaum" (juego con nombre de presidenta real)
-- ✅ "el carro que pides por SHEIN y llega en bolsa de plástico"
-- ✅ Analogías con su vida: Nestlé, Tec, HyRox, Assetto Corsa, ciberseguridad
-  Ejemplo: "el FSD tiene más fallos que mi proyecto de redes del Tec"
-  Ejemplo: "en Assetto Corsa el Mini va increíble, en CDMX llora en cada tope"
-- ✅ Comparaciones cotidianas mexicanas (topes, Oxxo, el IMSS, el SAT, Periférico)
-- ❌ Referencias inventadas o aleatorias ("grupos de WhatsApp de Jetta A4")
-- ❌ Chistes genéricos que funcionarían en cualquier canal de autos en español
-
-## Reglas de CTA
-- ✅ "Mándale esto a tu familiar que dice que el gobierno sí se preocupa por el medio ambiente"
-- ✅ "Guarda esto para cuando te pregunten cuánto cuesta tener un eléctrico"
-- ✅ "Mándale a tu amigo que insiste en que los simuladores no preparan para manejar de verdad"
-- ✅ Cortar en seco con la imagen más impactante (sin CTA verbal)
-- ❌ "Comenta SÍ o NO" — PROHIBIDO
-- ❌ "Dale like" — PROHIBIDO
-- ❌ "¿Tú qué opinas?" — PROHIBIDO
-
-## Reglas de setup visual
-Siempre propón algo concreto que detenga el scroll antes de que se escuche una palabra.
-- ✅ "Texto '¿Un Tesla mexicano?' en negro sobre blanco, 1.5 seg, luego corte a cara de duda"
-- ✅ "Cámara fija desde asiento trasero. Tú leyendo. FSD activo."
-- ✅ "Plano picado desde arriba con DJI OM. Tú junto al carro mirando abajo."
-- ✅ "El cuadro del Assetto Corsa en la pantalla, luego corte al volante real del mismo carro"
-- ❌ "Grábate hablando frente a la cámara" — demasiado genérico
-
-## Frases que sí suenan a Los Calderas
-"No manches", "O sea...", "Básicamente", "Espérense", "La verdad es que...", "Nadie habla de esto pero...", "Nambre...", "A ver si..."
-
-**REGLA CRÍTICA de expresiones de impacto**:
-1. Cada expresión se usa MÁXIMO UNA VEZ por guión — si ya salió "nambre", no la repitas.
-2. NO uses "nambre" en todos los guiones. Es UNA opción entre varias, no la expresión por defecto. La mayoría de los guiones deben abrirse SIN "nambre" — con "o sea", "espérense", una frase directa, o directo al dato sin coletilla.
-3. Si en el CONTEXTO DEL CANAL aparecen guiones recientes que ya usaron "nambre", usa una diferente esta vez.
-4. El guión más natural es el que no suena a que memorizaste un lista de palabras mexicanas — suena a que así hablas tú.
+## Modo Director — cómo se graba (estilo plática)
+Todo está pensado para grabar FÁCIL y editar poco:
+- **Una sola toma continua** es el default: caminando, manejando, o selfie hablando casual.
+- El **DJI Mic siempre puesto** (buen audio es lo único no negociable). Tripie sobre el tablero para manejar; dron Neo solo si la toma es fácil.
+- **No es teleprompter**: se le dan 2-3 puntos para que los diga con sus palabras, como contándole a un cuate.
+- Spots reales de su día (ver contexto-actual): cochera, manejando el Swift, el carro con FSD, plazas, gym, casa.
+- Si muestra FSD: es supervisado — manos cerca del volante, solo lo enseña un momento.
 
 ## Frases PROHIBIDAS
-"¡Hola a todos!", "¿Cómo están?", "En el video de hoy", "Antes de empezar", "No olviden suscribirse", "Comenta SÍ o NO", "¿Tú qué opinas?", "¿Ustedes ya escucharon de...?"
+"¡Hola a todos!", "¿Cómo están?", "En el video de hoy", "No olviden suscribirse", "Comenta SÍ o NO", "¿Tú qué opinas?", "Dale like".
+
+---
+
+# Guiones de referencia (el estándar de calidad — imítalos)
+
+Estos 5 son el tono exacto que busca Isaac. Estúdialos: cómo abre, cómo enseña, dónde mete el chiste, cómo remata.
+
+## Ref 1 — HOWTO · "Cargo el Tesla en plazas"
+- **Gancho:** "Llevo meses cargando el Tesla de mi papá y casi no lo siento en mi cartera."
+- **Cuerpo:** "Todos me preguntan cuánto te sube el recibo de luz por cargar un Tesla. Y la verdad… en mi casa no sube, porque no lo cargamos ahí. Te explico: en un montón de plazas hay cargadores. Llegas, lo conectas, te vas a hacer el súper o a comer, y cuando regresas el Caldermóvil —así le digo al Tesla de mi papá— ya tiene su pila. Cargar sí cuesta, pero muchísimo menos que llenar un tanque de gasolina. ¿La desventaja? Es lento, tarda sus horas. Pero o sea, no estás ahí viéndolo, andas en tus cosas. Es como dejar el celular cargando mientras trabajas. El detalle es que ya me sé qué plazas tienen cargador. Y sí, a veces hago el súper nomás porque me queda de paso."
+- **CTA:** "Guarda esto para cuando alguien jure que un eléctrico te dispara el recibo de luz."
+
+## Ref 2 — OPINIÓN · "Tengo un Tesla en casa y manejo esto"
+- **Gancho:** "En mi casa hay un Tesla… y yo manejo esto." (corta al Swift)
+- **Cuerpo:** "Y te explico por qué, porque a todos les saca de onda. El Tesla es de mi papá, una nave, increíble. Pero el carro que manejo a diario es mi Swift, y es a propósito. El Tesla está hecho para que te relajes: maneja casi solo, silencioso, como nave espacial. El Swift es lo contrario —manual, vibra, hace ruido— y se siente vivo. Para CDMX, entre topes y Periférico, un carrito que no pesa nada y que controlas tú con la palanca es de lo más divertido. El Tesla maneja por ti; el Swift te hace querer manejar. Ojo, el Tesla es buenísimo. Pero a los 20, prefiero el que me saca una sonrisa al que me estaciona solo."
+- **CTA:** "Mándale esto a tu cuate que cree que el carro más caro siempre gana."
+
+## Ref 3 — LIFESTYLE · "Becario… o precario"
+- **Gancho:** "Día de becario en vacaciones. O más bien… precario."
+- **Cuerpo:** "Todos creen que vacaciones de la escuela es no hacer nada. Y yo trabajando desde las 8, en pijama, con un café que ya recalenté tres veces. A la 1 cierro la laptop, como, y aquí viene lo mejor del día: me voy al gym. Esa media hora —a veces manejando el Swift, a veces caminando— es mi terapia, lo único del día donde nadie me escribe. Regreso, y en la noche a darle a un proyecto que traigo con un amigo. ¿Glamoroso? Para nada. Pero alguien tenía que decir que 'vacaciones de ingeniería' es puro trabajo y proteína."
+- **CTA:** "Guarda esto si tú también estás 'de vacaciones' pero trabajando. Banda precaria, unidos."
+
+## Ref 4 — FSD + LISTICLE · "5 rolas de dolido para el carro"
+- **Gancho:** "Hoy me aburrí y dejé que el Tesla me llevara solo por un café. Así que aquí van 5 rolas de dolido para tu media hora de terapia en el carro."
+- **Cuerpo:** "Sí, esto es el FSD: el Tesla maneja solo y yo voy de copiloto en mi propio carro. Bueno… en el de mi papá. Así que aprovecho para pasarte mi playlist de terapia. La número 5: [rola], para cuando vas en el Periférico fingiendo que estás bien. La 4: [rola], ilegal escucharla sin ver por la ventana dramáticamente. La 3, la 2… [con tu comentario chistoso]. Y la número 1, la que de verdad cura. Y mira, mientras te conté esto, el Tesla ya me dejó en el café. La terapia más barata de CDMX: cero gasolina, puro sentimiento."
+- **CTA:** "Dame tus rolas de dolido y las pongo en el próximo viaje del Tesla."
+
+## Ref 5 — TECH HOW-TO con puente a carros · "La app que uso para todo"
+- **Gancho:** "Mientras el Tesla maneja solo, te enseño la app que uso para no batallar: Claude."
+- **Cuerpo:** "Ya que el carro se maneja solo, yo aprovecho el tiempo. La herramienta que más uso es Claude —es como ChatGPT pero, la neta, más inteligente para lo que yo hago. Le puedo pedir que me resuma un documento de la chamba, que me explique un tema como si tuviera 5 años, o que me arme el plan de la semana. Todo mientras voy en el carro sin tocar el volante. Soy estudiante de ingeniería y becario de tecnología, y te lo digo: el que aprenda a usar bien estas IAs va a tener una ventaja enorme. No es trampa, es como tener un asistente que nunca duerme. Bueno, ya llegué. Hasta para llegar usé dos inteligencias artificiales: una que maneja y otra que piensa."
+- **CTA:** "Guarda esto y dime para qué quieres que use Claude en el próximo video."
