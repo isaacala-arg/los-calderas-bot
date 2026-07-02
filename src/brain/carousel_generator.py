@@ -1,6 +1,7 @@
 """Genera carruseles (texto por slide, listo para pegar en Canva)."""
 import json
 import random
+from datetime import date, timedelta
 from src.brain import llm_client
 from src.brain.script_generator import _load_voice_guide, _load_contexto_actual
 from src.models import Carousel
@@ -10,25 +11,43 @@ Responde SOLO con JSON válido (sin markdown, sin ```):
 {
   "title": "título del carrusel (sin el prefijo 'Carrusel:')",
   "slides": [
-    {"titulo": "texto grande del slide", "bullets": ["bullet corto 1", "bullet corto 2"]}
+    {"titulo": "texto grande del slide", "bullets": ["bullet corto 1", "bullet corto 2"], "fuente": "Medio — YYYY-MM-DD (solo slides de noticia; portada y cierre van sin fuente)"}
   ],
   "caption": "caption para el post (1-2 líneas, tono de Isaac)",
   "hashtags": ["5 hashtags"]
 }
-Reglas de slides: 6 a 8 slides. Slide 1 = portada con gancho (bullets vacíos).
-Último slide = cierre con continuidad implícita (nunca 'sígueme' literal).
+Reglas de slides: 6 a 8 slides. Slide 1 = portada con gancho (bullets vacíos, sin fuente).
+Último slide = cierre con continuidad implícita (nunca 'sígueme' literal), sin fuente.
 Bullets de máximo 12 palabras — es para leerse en un carrusel, no un ensayo.
 """
 
+# Cuerpo de "Semana en tech". Recibe la ventana de fechas por concatenación
+# (nunca .format() — los archivos de estilo pueden traer llaves).
 _SEMANA_TECH_CUERPO = """Genera el carrusel semanal "Semana en tech: lo que pasó y por qué importa" para Los Calderas.
 
-BUSCA EN LA WEB las 4-5 noticias de tecnología MÁS relevantes de los últimos 7 días
-(prioriza: IA, autos eléctricos/tech automotriz, ciberseguridad, gadgets con impacto en México).
-VERIFICACIÓN: usa SOLO noticias que encuentres con la búsqueda y cuya fecha confirmes dentro de
-los últimos 7 días; si no puedes verificar una noticia, no la incluyas. Nunca inventes.
+BÚSQUEDA AMPLIA (no te quedes con lo primero que salga): haz VARIAS búsquedas distintas —
+noticias de IA de la semana, ciberseguridad, lanzamientos de gadgets, tech automotriz/EVs,
+startups y empresas tech, y qué está EN TENDENCIA en redes esta semana. Junta al menos
+10 noticias candidatas y de ahí ELIGE las 4-5 mejores. Enfócate en TECNOLOGÍA (IA,
+ciberseguridad, gadgets, software, EVs); nada de política pura ni notas flojas de relleno.
+
+PRIORIDAD GEOGRÁFICA al elegir: 1º noticias de/que afecten a MÉXICO, 2º LATAM,
+3º las globales que de verdad importan (un lanzamiento mundial de IA sí; una nota local
+de otro país no). El mix ideal: 1-2 de México/LATAM + 2-3 globales fuertes.
+
+VERIFICACIÓN DE FECHA (no negociable): SOLO noticias PUBLICADAS dentro de la ventana de
+fechas indicada abajo. Confirma la fecha de publicación en la fuente; si un tema suena
+conocido, sospecha: puede ser noticia vieja recirculada (NO incluyas anuncios de hace
+semanas o meses aunque sigan sonando). Si no puedes confirmar la fecha, descártala.
+
+FUENTES (obligatorio): cada slide de noticia lleva su campo "fuente" con el MEDIO CONFIABLE
+donde la verificaste + la fecha de publicación (formato "Medio — YYYY-MM-DD"). Medios
+confiables: Reuters, AP, Bloomberg, The Verge, TechCrunch, Wired, Ars Technica, Xataka,
+El País, Expansión, El Economista, DPL News, sitios oficiales de las empresas. NO uses
+blogs random, agregadores ni redes sociales como fuente única.
 
 Formato por slide de noticia: titulo = la noticia dicha como Isaac la diría (con gancho),
-bullets = ["qué pasó en 1 línea", "por qué te importa a ti en México"].
+bullets = ["qué pasó en 1 línea", "por qué te importa / remate con humor"].
 Es una SERIE SEMANAL: el cierre deja la expectativa de la próxima entrega sin decir "sígueme".
 """ + _JSON_SCHEMA
 
@@ -62,7 +81,11 @@ def _parse(response, carousel_type: str) -> Carousel:
         bullets = s.get("bullets", [])
         if not isinstance(bullets, list):
             bullets = [str(bullets)]
-        slides.append({"titulo": str(s.get("titulo", "")), "bullets": [str(b) for b in bullets]})
+        slides.append({
+            "titulo": str(s.get("titulo", "")),
+            "bullets": [str(b) for b in bullets],
+            "fuente": str(s.get("fuente", "") or ""),
+        })
 
     return Carousel(
         title=str(data["title"]),
@@ -74,7 +97,16 @@ def _parse(response, carousel_type: str) -> Carousel:
 
 
 def generate_semana_tech() -> Carousel:
-    prompt = f"{_load_voice_guide()}\n\n---\n{_load_contexto_actual()}\n\n{_SEMANA_TECH_CUERPO}"
+    # La ventana de fechas va explícita: el modelo no sabe qué día es hoy,
+    # y sin esto acepta noticias viejas recirculadas (feedback de Isaac).
+    hoy = date.today()
+    desde = hoy - timedelta(days=6)
+    ventana = (
+        f"HOY es {hoy.isoformat()}. Ventana válida de publicación: "
+        f"del {desde.isoformat()} al {hoy.isoformat()} (últimos 7 días). "
+        f"Cualquier noticia publicada antes del {desde.isoformat()} está PROHIBIDA.\n\n"
+    )
+    prompt = f"{_load_voice_guide()}\n\n---\n{_load_contexto_actual()}\n\n{ventana}{_SEMANA_TECH_CUERPO}"
     response = llm_client.heavy(prompt, search=True)
     return _parse(response, "semana_tech")
 

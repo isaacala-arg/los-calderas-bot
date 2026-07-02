@@ -6,7 +6,7 @@ _FAKE = json.dumps({
     "title": "Semana en tech: lo que pasó y por qué importa",
     "slides": [
         {"titulo": "Portada: 3 noticias que sí te afectan", "bullets": []},
-        {"titulo": "Apple libera X", "bullets": ["Qué pasó", "Por qué te importa"]},
+        {"titulo": "Apple libera X", "bullets": ["Qué pasó", "Por qué te importa"], "fuente": "The Verge — 2026-07-01"},
         {"titulo": "Cierre", "bullets": ["La próxima entrega el viernes"]},
     ],
     "caption": "Lo que pasó esta semana en tech, sin humo.",
@@ -34,7 +34,29 @@ def test_prompt_semana_tech_exige_verificacion(mocker):
     cg.generate_semana_tech()
     prompt = mock.call_args[0][0]
     assert "últimos 7 días" in prompt
-    assert "NO VERIFICADO" in prompt or "no la incluyas" in prompt
+    assert "descártala" in prompt or "no la incluyas" in prompt
+
+
+def test_prompt_semana_tech_ventana_fechas_y_fuentes(mocker):
+    """Feedback de Isaac: fechas reales verificadas, fuentes citadas,
+    prioridad MX->LATAM->mundo, y búsqueda amplia (no lo primero que salga)."""
+    from datetime import date
+    mock = _mock_heavy(mocker)
+    cg.generate_semana_tech()
+    prompt = mock.call_args[0][0]
+    assert f"HOY es {date.today().isoformat()}" in prompt   # el modelo sabe qué día es
+    assert "PROHIBIDA" in prompt                            # ventana dura de fechas
+    assert "FUENTES" in prompt and "Reuters" in prompt      # fuentes confiables citadas
+    assert "LATAM" in prompt and "MÉXICO" in prompt         # prioridad geográfica
+    assert "10 noticias candidatas" in prompt               # búsqueda amplia
+    assert "EN TENDENCIA" in prompt                         # tendencias
+
+
+def test_parse_incluye_fuente(mocker):
+    _mock_heavy(mocker)
+    c = cg.generate_semana_tech()
+    assert c.slides[1]["fuente"] == "The Verge — 2026-07-01"
+    assert c.slides[0]["fuente"] == ""  # portada sin fuente
 
 
 def test_carousel_tema_toma_del_banco(mocker):

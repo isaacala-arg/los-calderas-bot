@@ -45,7 +45,7 @@ def test_write_carousel_crea_pagina_ordenada(mocker):
         title="Semana en tech: 30 jun - 4 jul",
         slides=[
             {"titulo": "Portada", "bullets": []},
-            {"titulo": "Noticia 1", "bullets": ["qué pasó", "por qué te importa"]},
+            {"titulo": "Noticia 1", "bullets": ["qué pasó", "por qué te importa"], "fuente": "Reuters — 2026-07-01"},
         ],
         caption="La semana sin humo.",
         hashtags=["#techtok"],
@@ -61,3 +61,4 @@ def test_write_carousel_crea_pagina_ordenada(mocker):
     contenido = str(kwargs["children"])
     assert "Slide 1" in contenido and "Slide 2" in contenido
     assert "por qué te importa" in contenido
+    assert "Fuente: Reuters — 2026-07-01" in contenido

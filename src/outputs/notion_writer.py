@@ -56,6 +56,8 @@ def write_carousel(carousel: Carousel) -> str:
     for i, slide in enumerate(carousel.slides, 1):
         children.append(_bold_line(f"Slide {i} — {slide['titulo']}"))
         children += [_bullet(b) for b in slide["bullets"]]
+        if slide.get("fuente"):
+            children.append(_p(f"Fuente: {slide['fuente']}"))
     response = notion.pages.create(
         parent={"database_id": settings.NOTION_DATABASE_ID},
         properties={
