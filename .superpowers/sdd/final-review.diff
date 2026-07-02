@@ -1,0 +1,1405 @@
+e541f8f fix: prompts de carrusel sin .format() — inmune a llaves en archivos de estilo
+4f742b9 test: e2e reel/vlog/carrusel hasta Notion con mocks
+8695979 feat: carruseles a Notion + Semana en tech viernes 7am + carrusel manual
+4ce4f7c feat: generador de carruseles (Semana en tech + banco de temas)
+fc23bbf feat: pilar vlog voz en off, fuera videojuegos, regla de verificacion
+f917b16 feat: libreria de ganchos y CTAs por familias con rotacion
+037cdc3 feat: guiones publicados de Isaac como few-shot de voz real
+0a4f707 feat: router llm_client light/heavy con proveedor intercambiable
+=== STAT ===
+ .github/workflows/carousel.yml         |  28 +++++
+ .github/workflows/semana-tech.yml      |  24 +++++
+ scripts/run_carousel.py                |  20 ++++
+ scripts/run_custom_topic.py            |   6 +-
+ scripts/run_generator.py               |   6 +-
+ scripts/run_semana_tech.py             |  15 +++
+ src/brain/carousel_generator.py        |  87 ++++++++++++++++
+ src/brain/evaluator.py                 |   4 +-
+ src/brain/ganchos.py                   |  94 +++++++++++++++++
+ src/brain/llm_client.py                |  32 ++++++
+ src/brain/script_generator.py          |  39 ++++++-
+ src/models.py                          |   9 ++
+ src/outputs/notion_writer.py           |  28 ++++-
+ style/banco-ganchos.md                 | 180 +++++++++++++++++++++++++++++++++
+ style/guiones-publicados.md            |  87 ++++++++++++++++
+ style/los-calderas-voice.md            |   2 +-
+ tests/brain/test_carousel_generator.py |  58 +++++++++++
+ tests/brain/test_ganchos.py            |  27 +++++
+ tests/brain/test_llm_client.py         |  26 +++++
+ tests/brain/test_script_generator.py   |  41 ++++++++
+ tests/outputs/test_notion_writer.py    |  29 +++++-
+ tests/test_e2e_contenido.py            |  58 +++++++++++
+ 22 files changed, 884 insertions(+), 16 deletions(-)
+=== DIFF ===
+diff --git a/.github/workflows/carousel.yml b/.github/workflows/carousel.yml
+new file mode 100644
+index 0000000..e77f753
+--- /dev/null
++++ b/.github/workflows/carousel.yml
+@@ -0,0 +1,28 @@
++name: Carrusel por Tema (manual)
++
++on:
++  workflow_dispatch:
++    inputs:
++      topic:
++        description: "Parte del título del tema (vacío = al azar del banco)"
++        required: false
++        default: ""
++
++jobs:
++  carousel:
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - uses: actions/setup-python@v5
++        with:
++          python-version: "3.11"
++          cache: "pip"
++      - run: pip install -r requirements.txt
++      - name: Generate topic carousel
++        env:
++          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
++          NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
++          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
++          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
++          CAROUSEL_TOPIC: ${{ github.event.inputs.topic }}
++        run: python scripts/run_carousel.py
+diff --git a/.github/workflows/semana-tech.yml b/.github/workflows/semana-tech.yml
+new file mode 100644
+index 0000000..61be33a
+--- /dev/null
++++ b/.github/workflows/semana-tech.yml
+@@ -0,0 +1,24 @@
++name: Semana en Tech (carrusel semanal)
++
++on:
++  schedule:
++    - cron: "0 13 * * 5"   # viernes 7am CDMX (UTC-6)
++  workflow_dispatch:
++
++jobs:
++  carousel:
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - uses: actions/setup-python@v5
++        with:
++          python-version: "3.11"
++          cache: "pip"
++      - run: pip install -r requirements.txt
++      - name: Generate weekly tech carousel
++        env:
++          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
++          NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
++          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
++          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
++        run: python scripts/run_semana_tech.py
+diff --git a/scripts/run_carousel.py b/scripts/run_carousel.py
+new file mode 100644
+index 0000000..655056b
+--- /dev/null
++++ b/scripts/run_carousel.py
+@@ -0,0 +1,20 @@
++import sys, os
++sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
++from src.brain.carousel_generator import generate_carousel_tema, CAROUSEL_TOPICS
++from src.outputs.notion_writer import write_carousel
++
++
++def main():
++    wanted = os.environ.get("CAROUSEL_TOPIC", "").strip().lower()
++    topic = None
++    if wanted:
++        topic = next((t for t in CAROUSEL_TOPICS if wanted in t["title"].lower()), None)
++        if topic is None:
++            print(f"AVISO: '{wanted}' no está en el banco; usando uno al azar")
++    carousel = generate_carousel_tema(topic)
++    url = write_carousel(carousel)
++    print(f"Carrusel guardado en Notion: {url}")
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/scripts/run_custom_topic.py b/scripts/run_custom_topic.py
+index 99b6995..c05ec15 100644
+--- a/scripts/run_custom_topic.py
++++ b/scripts/run_custom_topic.py
+@@ -1,38 +1,38 @@
+ import sys
+ import os
+ 
+ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ 
+-from src.brain import gemini_client
++from src.brain import llm_client
+ from src.brain.script_generator import generate, build_canal_context
+ from src.outputs.notion_writer import write_script
+ from src.outputs.notion_reader import get_recent_titles, get_approved_examples
+ from src.models import Article
+ from datetime import datetime, timezone
+ 
+ 
+ def research_topic(topic: str) -> Article:
+-    response = gemini_client.call(
++    response = llm_client.light(
+         f"""Investiga este tema buscando en internet para el canal automotriz mexicano "Los Calderas":
+ 
+ TEMA: {topic}
+ 
+ Busca información actual y proporciona un resumen factual que incluya:
+ - Qué pasó exactamente y cuándo (con fechas reales)
+ - Datos concretos: precios, velocidades, autonomía, dimensiones, fechas de lanzamiento, cifras de ventas
+ - Por qué es relevante para México y la industria automotriz
+ - Contexto: cómo se compara con otros productos similares
+ - Solo si aplica directamente: cómo afecta a dueños de Tesla, Mini o Suzuki Swift
+ 
+ Responde en español, 4-5 párrafos, tono informativo y preciso. Prioriza datos verificables sobre especulación.""",
+-        config=gemini_client.SEARCH_CONFIG,
++        search=True,
+     )
+     return Article(
+         title=topic,
+         url="",
+         summary=response.text,
+         source="investigación personalizada",
+         published=datetime.now(timezone.utc),
+     )
+ 
+ 
+diff --git a/scripts/run_generator.py b/scripts/run_generator.py
+index 7bf86b0..1058ca2 100644
+--- a/scripts/run_generator.py
++++ b/scripts/run_generator.py
+@@ -4,21 +4,21 @@ from datetime import date
+ 
+ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ 
+ from src.sources.rss_fetcher import fetch_articles
+ from src.sources.reddit_fetcher import fetch_posts
+ from src.sources.youtube_fetcher import fetch_trending
+ from src.sources.trends_fetcher import fetch_trends
+ from src.brain.evaluator import evaluate
+ from src.brain.script_generator import (
+     generate, generate_howto, generate_lifestyle, generate_opinion,
+-    generate_tech, generate_fsd, build_canal_context, append_avoid_hooks,
++    generate_tech, generate_fsd, generate_vlog, build_canal_context, append_avoid_hooks,
+ )
+ from src.outputs.notion_writer import write_script
+ from src.outputs.notion_reader import get_recent_titles, get_approved_examples
+ 
+ 
+ def _safe(label, fn, default):
+     """Ejecuta un fetcher sin que un fallo (RSS caído, pytrends bloqueado)
+     tumbe toda la generación. Devuelve `default` si truena."""
+     try:
+         return fn()
+@@ -71,22 +71,22 @@ def main():
+ 
+     # Script 2: pilar "enseña" — rota entre how-to, opinión y tech según el día.
+     # Así el contenido no es solo carros: también tecnología (Claude, IA, ciberseguridad).
+     teach_rotation = [generate_howto, generate_tech, generate_opinion]
+     ctx2 = append_avoid_hooks(canal_context, used_hooks)
+     script2 = teach_rotation[date.today().weekday() % len(teach_rotation)](canal_context=ctx2)
+     used_hooks.append(script2.hook)
+     url2 = write_script(script2)
+     print(f"[2/3] {script2.script_type.capitalize()} script saved: {url2}")
+ 
+-    # Script 3: pilar "personal/formato" — rota entre lifestyle y FSD+listicle.
+-    personal_rotation = [generate_lifestyle, generate_fsd]
++    # Script 3: pilar "personal/formato" — rota entre lifestyle, vlog y FSD+listicle.
++    personal_rotation = [generate_lifestyle, generate_vlog, generate_fsd]
+     ctx3 = append_avoid_hooks(canal_context, used_hooks)
+     script3 = personal_rotation[date.today().weekday() % len(personal_rotation)](canal_context=ctx3)
+     url3 = write_script(script3)
+     print(f"[3/3] {script3.script_type.capitalize()} script saved: {url3}")
+ 
+     print(f"\nListo! 3 guiones generados:")
+     print(f"  1. Trend     → {url1}")
+     print(f"  2. {script2.script_type.capitalize():<9} → {url2}")
+     print(f"  3. {script3.script_type.capitalize():<9} → {url3}")
+ 
+diff --git a/scripts/run_semana_tech.py b/scripts/run_semana_tech.py
+new file mode 100644
+index 0000000..5ad9876
+--- /dev/null
++++ b/scripts/run_semana_tech.py
+@@ -0,0 +1,15 @@
++import sys, os
++sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
++from src.brain.carousel_generator import generate_semana_tech
++from src.outputs.notion_writer import write_carousel
++
++
++def main():
++    print("Generando 'Semana en tech' (busqueda web, ultimos 7 dias)...")
++    carousel = generate_semana_tech()
++    url = write_carousel(carousel)
++    print(f"Carrusel guardado en Notion: {url}")
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/src/brain/carousel_generator.py b/src/brain/carousel_generator.py
+new file mode 100644
+index 0000000..d7725f5
+--- /dev/null
++++ b/src/brain/carousel_generator.py
+@@ -0,0 +1,87 @@
++"""Genera carruseles (texto por slide, listo para pegar en Canva)."""
++import json
++import random
++from src.brain import llm_client
++from src.brain.script_generator import _load_voice_guide, _load_contexto_actual
++from src.models import Carousel
++
++_JSON_SCHEMA = """
++Responde SOLO con JSON válido (sin markdown, sin ```):
++{
++  "title": "título del carrusel (sin el prefijo 'Carrusel:')",
++  "slides": [
++    {"titulo": "texto grande del slide", "bullets": ["bullet corto 1", "bullet corto 2"]}
++  ],
++  "caption": "caption para el post (1-2 líneas, tono de Isaac)",
++  "hashtags": ["5 hashtags"]
++}
++Reglas de slides: 6 a 8 slides. Slide 1 = portada con gancho (bullets vacíos).
++Último slide = cierre con continuidad implícita (nunca 'sígueme' literal).
++Bullets de máximo 12 palabras — es para leerse en un carrusel, no un ensayo.
++"""
++
++_SEMANA_TECH_CUERPO = """Genera el carrusel semanal "Semana en tech: lo que pasó y por qué importa" para Los Calderas.
++
++BUSCA EN LA WEB las 4-5 noticias de tecnología MÁS relevantes de los últimos 7 días
++(prioriza: IA, autos eléctricos/tech automotriz, ciberseguridad, gadgets con impacto en México).
++VERIFICACIÓN: usa SOLO noticias que encuentres con la búsqueda y cuya fecha confirmes dentro de
++los últimos 7 días; si no puedes verificar una noticia, no la incluyas. Nunca inventes.
++
++Formato por slide de noticia: titulo = la noticia dicha como Isaac la diría (con gancho),
++bullets = ["qué pasó en 1 línea", "por qué te importa a ti en México"].
++Es una SERIE SEMANAL: el cierre deja la expectativa de la próxima entrega sin decir "sígueme".
++""" + _JSON_SCHEMA
++
++_TEMA_CUERPO = """Genera un carrusel para Los Calderas sobre el tema indicado.
++
++Enseña algo útil con la voz de Isaac (analogías cotidianas, humor, cero humo).
++Todo dato debe ser real y verificable; si algo no se puede verificar, márcalo "DATO NO VERIFICADO".
++""" + _JSON_SCHEMA
++
++CAROUSEL_TOPICS = [
++    {"title": "5 cosas que aprendí siendo becario que no te enseñan en la escuela", "context": "Lifestyle profesional, alto potencial de guardado. Lecciones reales de oficina/corporativo SIN información confidencial de la empresa y sin nombrarla."},
++    {"title": "Cómo leer las especificaciones de un carro eléctrico sin que te vendan humo", "context": "Glosario visual: kWh (el tanque), autonomía WLTP vs real, tiempo de carga AC vs DC, con analogías cotidianas."},
++    {"title": "3 filosofías de conducción autónoma: Tesla vs Waymo vs tu sentido común", "context": "Comparativa de enfoques (visión vs lidar vs humano), explicada simple y con humor."},
++    {"title": "BYD, Tesla y el resto: quién fabrica qué de su propio carro", "context": "Integración vertical explicada con analogías (el taquero que hace sus propias tortillas)."},
++]
++
++
++def _parse(response, carousel_type: str) -> Carousel:
++    raw = response.text.strip()
++    if raw.startswith("```"):
++        raw = raw.split("```")[1]
++        if raw.startswith("json"):
++            raw = raw[4:]
++    try:
++        data = json.loads(raw.strip())
++    except json.JSONDecodeError as e:
++        raise ValueError(f"LLM returned non-JSON: {raw[:200]}") from e
++
++    slides = []
++    for s in data.get("slides", []):
++        bullets = s.get("bullets", [])
++        if not isinstance(bullets, list):
++            bullets = [str(bullets)]
++        slides.append({"titulo": str(s.get("titulo", "")), "bullets": [str(b) for b in bullets]})
++
++    return Carousel(
++        title=str(data["title"]),
++        slides=slides,
++        caption=str(data.get("caption", "")),
++        hashtags=[str(h) for h in data.get("hashtags", [])],
++        carousel_type=carousel_type,
++    )
++
++
++def generate_semana_tech() -> Carousel:
++    prompt = f"{_load_voice_guide()}\n\n---\n{_load_contexto_actual()}\n\n{_SEMANA_TECH_CUERPO}"
++    response = llm_client.heavy(prompt, search=True)
++    return _parse(response, "semana_tech")
++
++
++def generate_carousel_tema(topic: dict | None = None) -> Carousel:
++    topic = topic or random.choice(CAROUSEL_TOPICS)
++    tema_header = f"TEMA: {topic['title']}\nCONTEXTO: {topic['context']}\n\n"
++    prompt = f"{_load_voice_guide()}\n\n---\n{_load_contexto_actual()}\n\n{tema_header}{_TEMA_CUERPO}"
++    response = llm_client.heavy(prompt, search=True)
++    return _parse(response, "tema")
+diff --git a/src/brain/evaluator.py b/src/brain/evaluator.py
+index 4c9cf79..4067bb5 100644
+--- a/src/brain/evaluator.py
++++ b/src/brain/evaluator.py
+@@ -1,12 +1,12 @@
+ import json
+-from src.brain import gemini_client
++from src.brain import llm_client
+ from src.models import EvaluationResult
+ 
+ _PROMPT = """
+ Eres el curador de contenido para "Los Calderas", canal mexicano de autos y tecnología (TikTok/Reels/Shorts).
+ El creador es Isaac: 20 años, estudiante de ITC en el Tec de Monterrey, becario de Innovación IT en Nestlé.
+ Sus autos: Tesla Model Y LR 2026, Mini Countryman JCW 2021, Suzuki Swift Sport 2021.
+ Audiencia: mexicanos millennials/Gen Z, casual, que entienden de tech pero no son mecánicos.
+ 
+ Tu trabajo: elegir las 3 noticias con más potencial de video viral para México.
+ {trends_block}
+@@ -58,21 +58,21 @@ def evaluate(articles: list, trends: list | None = None) -> EvaluationResult:
+ 
+     articles_text = "\n".join(
+         f"[{i}] {a.source} — {a.title}\n    {a.summary[:200]}"
+         for i, a in enumerate(articles)
+     )
+ 
+     prompt = _PROMPT.format(
+         articles_text=articles_text,
+         trends_block=_build_trends_block(trends),
+     )
+-    response = gemini_client.call(prompt)
++    response = llm_client.light(prompt)
+     raw = response.text.strip()
+     if raw.startswith("```"):
+         raw = raw.split("```")[1]
+         if raw.startswith("json"):
+             raw = raw[4:]
+ 
+     try:
+         data = json.loads(raw.strip())
+     except json.JSONDecodeError as e:
+         raise ValueError(f"Gemini returned non-JSON response: {raw[:200]}") from e
+diff --git a/src/brain/ganchos.py b/src/brain/ganchos.py
+new file mode 100644
+index 0000000..10804d5
+--- /dev/null
++++ b/src/brain/ganchos.py
+@@ -0,0 +1,94 @@
++"""Familias de ganchos y CTAs (curadas del banco de Isaac, style/banco-ganchos.md).
++
++El LLM elige la familia y adapta el ___ al tema; la rotación se logra
++instruyéndolo a comparar contra los ganchos recientes que ya van en el
++CONTEXTO DEL CANAL (notion_reader) y los del mismo día (append_avoid_hooks).
++"""
++
++FAMILIAS = {
++    "reflexion": {
++        "tipos": ["lifestyle", "vlog", "opinion"],
++        "ejemplos": [
++            "Esto nadie te lo dice, pero todos lo piensan...",
++            "¿Qué pasaría si te dijera que ___?",
++            "Nadie te ha contado esto de ___...",
++        ],
++    },
++    "principiantes": {
++        "tipos": ["howto", "tech"],
++        "ejemplos": [
++            "Cómo empezar con ___ sin sentirte abrumado",
++            "El error que comete todo principiante en ___",
++            "Mi flujo de trabajo exacto para ___ (puedes copiarlo)",
++            "Las 5 cosas que me hubiera gustado saber antes de empezar ___",
++        ],
++    },
++    "hacks": {
++        "tipos": ["howto", "tech"],
++        "ejemplos": [
++            "3 herramientas que uso a diario para ___",
++            "Si siempre olvidas ___, prueba esto",
++            "La forma perezosa en la que organizo mi ___ (y funciona)",
++        ],
++    },
++    "instantaneo": {
++        "tipos": ["trend", "howto", "lifestyle", "opinion", "tech", "fsd", "vlog"],
++        "ejemplos": [
++            "Probablemente estás haciendo ___ mal (y ni siquiera te das cuenta)",
++            "Por qué tu ___ no está funcionando (y cómo solucionarlo)",
++            "Cometí este error durante meses; no hagas lo mismo",
++        ],
++    },
++    "choque_real": {
++        "tipos": ["trend", "tech", "fsd"],
++        "prioridad": True,  # la que mejor le ha funcionado a Isaac
++        "ejemplos": [
++            "Vi que [noticia real verificada] y como futuro ingeniero me pregunté...",
++            "Puse a [herramienta/IA] a decidir ___. El resultado ofendió a media familia.",
++            "[Cifra específica]. Eso es lo que me cuesta/tarda ___.",
++        ],
++    },
++    "vlog": {
++        "tipos": ["vlog"],
++        "ejemplos": [
++            "Abrir con la escena más visual del día SIN explicar; la explicación va en voz en off",
++            "Hoy pasé el día [haciendo X]. Esto fue lo que aprendí.",
++            "No planeaba grabar esto, pero pasó algo que quiero compartir.",
++        ],
++    },
++}
++
++CTAS = {
++    "utilidad": 'El favorito de Isaac: "Guarda esto para cuando [situación específica del tema]" / "Mándale esto al que [situación, con humor]"',
++    "pregunta_especifica": 'Pregunta que SOLO quien vio el video puede responder — nunca "¿qué opinas?" suelto',
++    "indirecto_seguir": 'NUNCA "sígueme" literal. Implicar continuidad: "Esto lo voy a seguir documentando, se viene la segunda parte"',
++    "reflexivo": "Solo para contenido personal: dejar la reflexión sin pedir nada",
++    "feedback": '"¿Les gustaría que les cuente más de [tema]?"',
++}
++
++
++def build_ganchos_block(script_type: str) -> str:
++    aplicables = {
++        name: fam for name, fam in FAMILIAS.items() if script_type in fam["tipos"]
++    }
++    if not aplicables:
++        aplicables = {"instantaneo": FAMILIAS["instantaneo"]}
++
++    lines = ["LIBRERÍA DE GANCHOS — elige UNA familia y adapta el ___ al tema:"]
++    for name, fam in aplicables.items():
++        tag = " (PRIORIDAD ALTA — la que mejor le funciona a Isaac)" if fam.get("prioridad") else ""
++        lines.append(f"- Familia '{name}'{tag}:")
++        lines += [f'    · "{e}"' for e in fam["ejemplos"]]
++
++    lines.append(
++        "\nREGLAS DE GANCHO: debe poder decirse/leerse en máximo 2-3 segundos. "
++        "NUNCA uses la misma familia dos veces seguidas — compara contra los ganchos "
++        "recientes del CONTEXTO DEL CANAL y los ya generados hoy, y si la familia se "
++        "repite, elige otra."
++    )
++    lines.append("\nFAMILIAS DE CTA — elige la que corresponda al contenido:")
++    lines += [f"- {name}: {desc}" for name, desc in CTAS.items()]
++    lines.append(
++        'REGLA DE CTA: jamás "sígueme" literal; si es pregunta, específica al contenido.'
++    )
++    return "\n".join(lines)
+diff --git a/src/brain/llm_client.py b/src/brain/llm_client.py
+new file mode 100644
+index 0000000..2976a6f
+--- /dev/null
++++ b/src/brain/llm_client.py
+@@ -0,0 +1,32 @@
++"""Router de LLM — un solo punto para cambiar de proveedor y de modelos.
++
++light() = tareas mecánicas/baratas (evaluar noticias, research, historias).
++heavy() = tareas creativas (guiones, carruseles).
++Para cambiar de proveedor: setear env LLM_PROVIDER y agregar su adapter aquí.
++"""
++import os
++from src.brain import gemini_client
++
++PROVIDER = os.environ.get("LLM_PROVIDER", "gemini")
++
++
++def _call_gemini(prompt: str, tier: str, search: bool):
++    model = gemini_client.MODEL_PRO if tier == "heavy" else gemini_client.MODEL_FLASH
++    config = gemini_client.SEARCH_CONFIG if search else None
++    return gemini_client.call(prompt, config=config, model=model)
++
++
++def _dispatch(prompt: str, tier: str, search: bool):
++    if PROVIDER == "gemini":
++        return _call_gemini(prompt, tier, search)
++    raise NotImplementedError(
++        f"Proveedor LLM '{PROVIDER}' no implementado — agrega su adapter en llm_client.py"
++    )
++
++
++def light(prompt: str, search: bool = False):
++    return _dispatch(prompt, "light", search)
++
++
++def heavy(prompt: str, search: bool = False):
++    return _dispatch(prompt, "heavy", search)
+diff --git a/src/brain/script_generator.py b/src/brain/script_generator.py
+index 6fa717a..e1742d2 100644
+--- a/src/brain/script_generator.py
++++ b/src/brain/script_generator.py
+@@ -1,31 +1,38 @@
+ import json
+ import os
+ import random
+ from datetime import datetime, timezone
+-from src.brain import gemini_client
++from src.brain import llm_client
++from src.brain.ganchos import build_ganchos_block
+ from src.models import Article, Script
+ 
+ _STYLE_DIR = os.path.join(os.path.dirname(__file__), "../../style")
+ VOICE_GUIDE_PATH = os.path.join(_STYLE_DIR, "los-calderas-voice.md")
+ CONTEXTO_ACTUAL_PATH = os.path.join(_STYLE_DIR, "contexto-actual.md")
++GUIONES_PUBLICADOS_PATH = os.path.join(_STYLE_DIR, "guiones-publicados.md")
+ 
+ # ─── INSTRUCCIONES COMUNES (DRY — se inyectan en todos los tipos) ──────────────
+ _COMMON = """
+ FORMATO: Reel vertical de 60 a 100 segundos. El campo "body" es el guión natural
+ (lo que Isaac diría platicando, no un ensayo) y debe tener entre 200 y 320 palabras —
+ suficiente material para que Isaac corte y adapte lo que quiera. Si tiene menos de 180
+ palabras, está incompleto: desarrolla más el tema, agrega otro ejemplo, dato o remate.
+ No lo rellenes con paja: cada oración debe enseñar algo o dar risa.
+ 
+ REGLA DE ORO: el video tiene que ENSEÑAR algo útil Y dar risa. Si no cumple ambas, reescríbelo.
+ 
++VERIFICACIÓN (no negociable): cualquier dato o noticia debe venir de la búsqueda web o del
++contexto dado — NUNCA lo inventes. Si un dato no se puede verificar, escríbelo explícito en
++"topic_context" con la marca "DATO NO VERIFICADO". Para noticias, usa solo de los últimos
++7-14 días; nunca recicles anuncios viejos como nuevos.
++
+ HUMOR (densidad alta, estilo aprobado por Isaac — ver Ref 6 del voice guide):
+ - Para explicar CUALQUIER cosa técnica, usa una metáfora cotidiana mexicana, nunca el término a secas.
+   Ej: el motor que se ahoga = un clavadista; sellado IP67 = tu celular que aguanta el clavado al baño;
+   la electrónica = una tablet de medio millón con ruedas.
+ - Prefiere el CHISTE DE DOS TIEMPOS: planta una imagen al inicio y haz que el remate haga callback a
+   ESA misma imagen (clavadista que respira → "se ahogó"). No dos chistes sueltos: uno que se paga solo.
+ - Mete VARIOS chistes, pero que cada uno también explique o avance algo. El dato técnico va escondido
+   dentro del chiste, no aparte. Remates mexicanos hiperlocales (Olinia, Periférico, el SAT, coca de piña).
+ 
+ CREATIVIDAD (lo más importante — los guiones aburridos se rechazan):
+@@ -108,38 +115,44 @@ _TYPE_GUIDANCE = {
+         "los carros (p.ej. lo enseña mientras el Tesla maneja con FSD). Termina con un remate seco."
+     ),
+     "fsd": (
+         "TIPO: FSD + LISTICLE/STORYTELLING. El Tesla (Caldermóvil) maneja solo con FSD mientras Isaac "
+         "cuenta algo en formato lista (5 datos, 5 rolas, 5 marcas, etc.) o una historia. Muestra que el carro maneja "
+         "solo al inicio. Recuerda: FSD es supervisado (manos cerca del volante, solo lo enseña un momento)."
+     ),
+     "evergreen": (
+         "TIPO: HOW-TO o OPINIÓN atemporal de carros/tech con datos reales."
+     ),
++    "vlog": (
++        "TIPO: VLOG con VOZ EN OFF sobre clips reales del día de Isaac. El campo 'body' es el "
++        "guion de la VOZ EN OFF (se graba encima de los clips, tono reflexivo pero con humor). "
++        "El gancho es la escena más visual/emotiva del día SIN explicarla aún. El campo 'puntos' "
++        "es la LISTA DE CLIPS que Isaac debe grabar durante el día (cortos, fáciles: llegando a la "
++        "oficina, el gym, manejando el Swift). Cierre con pregunta/reflexión que invite a comentar."
++    ),
+ }
+ 
+ # ─── BANCOS DE TEMAS ──────────────────────────────────────────────────────────
+ # Los temas son SEMILLAS con ángulo creativo. El prompt obliga a llevarlos aún
+ # más lejos. Cada uno tiene un FORMATO (experimento, reto, POV, reveal, "le pregunté a la IA").
+ _HOWTO_TOPICS = [
+     {"title": "Le pedí a la IA del Tesla que me dijera la neta de los eléctricos", "context": "REVELACIÓN: Isaac le pregunta a Grok (la IA dentro del Caldermóvil) las dudas reales de un eléctrico en México (carga, costo, autonomía) y traduce las respuestas con humor. Enseña datos reales en formato divertido."},
+     {"title": "Probé si el FSD sobrevive a los topes de mi colonia", "context": "EXPERIMENTO: Isaac pone el FSD del Tesla de su papá y muestra honestamente qué hace bien y dónde sufre con los topes/baches mexicanos. Enseña cómo funciona el FSD de verdad."},
+     {"title": "Cuánto me cuesta el Swift al mes vs lo que cree la gente", "context": "REVEAL con número: Isaac calcula en vivo el costo real mensual de su Swift (gasolina, mantenimiento) y lo compara con lo que la gente asume. Revela el número al inicio."},
+     {"title": "El truco para cargar un Tesla casi sin que lo sientas en la cartera", "context": "HOW-TO con dato: cómo y dónde carga su papá el Caldermóvil en plazas, cuánto cuesta de verdad vs gasolina. Práctico y con el chiste de hacer el súper por el cargador."},
+     {"title": "Hice que el Tesla planeara un viaje y esto me dijo", "context": "DEMO en vivo: Isaac le pide al Tesla una ruta larga (con paradas de carga) y muestra cómo lo calcula. Enseña que la ansiedad de autonomía es un mito, con humor."},
+ ]
+ 
+ _LIFESTYLE_TOPICS = [
+     {"title": "POV: eres becario y el único carro libre es el de tu papá", "context": "POV/situación: el dilema de agarrar el Caldermóvil (Tesla de papá) vs su Swift. Humor becario/precario, pedir permiso, la presión de no rayarlo."},
+     {"title": "Mi rutina de becario en vacaciones que nadie pidió ver", "context": "Día real con autoburla: home office desde las 8 en pijama, café recalentado 3 veces, gym a las 3 (a veces caminando), proyecto de ciber en la noche. El chiste becario/precario."},
+     {"title": "Manejar al gym es mi terapia más barata", "context": "Pedazo honesto: el trayecto al gym con su música es lo único del día sin notificaciones. Conecta cambio físico + carro + salud mental, con humor."},
+-    {"title": "Lo que Assetto Corsa NO te prepara para manejar en CDMX", "context": "Comparación con giro: Isaac juega el simulador y muestra qué sí y qué definitivamente NO te prepara (topes, microbuses, el tío en sentido contrario). Humor de ingeniero gamer."},
+     {"title": "Ranking de los 3 carros de mi familia según para qué sirven", "context": "Ranking con giro: Swift (suyo), Caldermóvil (de papá), Mini (de mamá), cada uno gana en una categoría inesperada. Honesto y divertido, sin decir 'mi Tesla'."},
+ ]
+ 
+ _OPINION_TOPICS = [
+     {"title": "El carro más caro de mi casa no es el que quiero manejar", "context": "POSTURA con gancho: por qué prefiere su Swift al Caldermóvil de su papá. Diversión vs comodidad. Postura clara desde el inicio, evidencia real, sin copiar fórmulas previas."},
+     {"title": "La verdad incómoda del FSD que los fans no quieren oír", "context": "OPINIÓN filosa: Isaac, como ingeniero, da su postura honesta sobre el FSD en México: dónde es genial y dónde es marketing. Con datos de uso real."},
+     {"title": "Comprar un deportivo barato es más inteligente que un eléctrico caro", "context": "TESIS provocadora: argumento de por qué un Swift Sport da más satisfacción por peso/precio que gastar el triple. Postura tajante con concesión honesta."},
+     {"title": "Manejar un eléctrico te cambia algo que nadie te dice", "context": "OPINIÓN inesperada: el cambio mental real de manejar el Caldermóvil (silencio, no gasolineras, planear) — lo bueno y lo que extrañas de un carro 'normal'."},
+ ]
+ 
+@@ -151,20 +164,27 @@ _TECH_TOPICS = [
+     {"title": "Hackeé mi rutina con IA: chamba + gym + proyecto sin morir", "context": "HOW-TO de productividad: cómo Isaac usa IA para organizar su día de becario/estudiante/emprendedor. Concreto, aplicable, con el toque de que parece de hacker pero es legal."},
+ ]
+ 
+ _FSD_TOPICS = [
+     {"title": "5 rolas de dolido para tu media hora de terapia en el carro", "context": "FSD + listicle: el Tesla maneja solo mientras Isaac da su playlist de dolido con un comentario chistoso de cada una. Deja las rolas como [tu rola] para que Isaac las ponga."},
+     {"title": "Dejé que el Tesla me llevara a cualquier lado por un café", "context": "FSD + storytelling: Isaac aburrido le pide a Grok/FSD que lo lleve por un café y mientras cuenta 5 datos curiosos de él. Muestra que el carro maneja solo."},
+     {"title": "Califiqué a los conductores de CDMX mientras el Tesla manejaba solo", "context": "FSD + bit: con las manos libres (supervisado), Isaac narra y califica con humor las maniobras locas del tráfico de CDMX que el FSD tiene que esquivar."},
+     {"title": "Las monerías del Tesla que nadie te muestra así", "context": "Reveal creativo: features cool del Caldermóvil (modo centinela, bocina, front, juegos) mostrados de forma divertida y rápida, no como reseña aburrida."},
+ ]
+ 
++_VLOG_TOPICS = [
++    {"title": "Un día real de becario de tecnología (voz en off)", "context": "Clips del día: despertarse, home office u oficina, gym, noche trabajando en su proyecto. Voz en off honesta sobre lo que nadie cuenta de ser becario a los 20."},
++    {"title": "Del gym a la chamba: así se ve mi cambio físico", "context": "Clips de entreno + rutina diaria. Voz en off sobre disciplina vs motivación ('tu cincuenta tiene que ser tu cien'), sin sermón."},
++    {"title": "Grabé todo lo que hice un viernes (y por qué el Swift es parte)", "context": "Clips del viernes: oficina, tráfico en el Swift, gym, noche. Voz en off con humor de ingeniero sobre la rutina real."},
++    {"title": "Lo que aprendí esta semana (recap personal)", "context": "Clips sueltos de la semana. Voz en off: 2-3 aprendizajes concretos de chamba/gym/proyecto con remate de humor."},
++]
++
+ 
+ def _to_str(value) -> str:
+     """Gemini a veces devuelve listas en vez de strings — las une."""
+     if isinstance(value, list):
+         return "\n\n".join(str(item) for item in value)
+     return str(value) if value is not None else ""
+ 
+ 
+ def _to_list(value) -> list:
+     """Normaliza a lista de strings."""
+@@ -283,33 +303,38 @@ def _build_prompt(script_type: str, title: str, context: str, canal_context: str
+     guidance = _TYPE_GUIDANCE.get(script_type, _TYPE_GUIDANCE["trend"])
+ 
+     sections = [
+         voice_guide,
+         "---",
+         guidance,
+         f"TEMA SEMILLA: {title}\nCONTEXTO DEL TEMA: {context}",
+     ]
+     if contexto_actual:
+         sections.append("---\nCONTEXTO ACTUAL DE ISAAC (adapta el tema a esto):\n" + contexto_actual)
++    guiones_publicados = _load_file(GUIONES_PUBLICADOS_PATH)
++    if guiones_publicados:
++        sections.append(
++            "---\nGUIONES YA PUBLICADOS POR ISAAC (voz real — imita el tono, el ritmo y los "
++            "patrones; PROHIBIDO copiar frases o temas):\n" + guiones_publicados
++        )
+     if canal_context:
+         sections.append("---\nCONTEXTO DEL CANAL:\n" + canal_context)
++    sections.append("---\n" + build_ganchos_block(script_type))
+     sections.append(_COMMON.format(script_type=script_type))
+     return "\n\n".join(sections)
+ 
+ 
+ def generate(article: Article, script_type: str = "trend", canal_context: str = "") -> Script:
+     prompt = _build_prompt(script_type, article.title, article.summary, canal_context)
+     # Grounding (búsqueda en Google) solo para noticias/tendencias y tech, que
+     # se benefician de datos actuales. Los demás usan temas del banco.
+-    config = gemini_client.SEARCH_CONFIG if script_type in ("trend", "tech", "evergreen") else None
+-    # Guiones = tarea creativa → modelo PRO (más inteligente para humor y tono).
+-    response = gemini_client.call(prompt, config=config, model=gemini_client.MODEL_PRO)
++    response = llm_client.heavy(prompt, search=script_type in ("trend", "tech", "evergreen"))
+     return _parse_response(response, script_type)
+ 
+ 
+ def _generate_from_bank(bank: list, script_type: str, canal_context: str) -> Script:
+     topic = random.choice(bank)
+     article = Article(
+         title=topic["title"],
+         url="",
+         summary=topic["context"],
+         source=script_type,
+@@ -331,15 +356,19 @@ def generate_opinion(canal_context: str = "") -> Script:
+ 
+ 
+ def generate_tech(canal_context: str = "") -> Script:
+     return _generate_from_bank(_TECH_TOPICS, "tech", canal_context)
+ 
+ 
+ def generate_fsd(canal_context: str = "") -> Script:
+     return _generate_from_bank(_FSD_TOPICS, "fsd", canal_context)
+ 
+ 
++def generate_vlog(canal_context: str = "") -> Script:
++    return _generate_from_bank(_VLOG_TOPICS, "vlog", canal_context)
++
++
+ def generate_evergreen(canal_context: str = "") -> Script:
+     """Legacy: alterna entre howto y opinion."""
+     if random.random() < 0.5:
+         return generate_howto(canal_context=canal_context)
+     return generate_opinion(canal_context=canal_context)
+diff --git a/src/models.py b/src/models.py
+index 819a10e..46adce4 100644
+--- a/src/models.py
++++ b/src/models.py
+@@ -30,10 +30,19 @@ class Script:
+     # ── Modo Director (cómo grabarlo, estilo plática) ──
+     spot: str                   # lugar concreto y fácil donde grabar
+     como_grabar: str            # equipo + setup de la toma (cel/DJI Mic/tripie/dron)
+     puntos: list                # list[str] — puntos a tocar para improvisar
+     arranque: str               # primeras palabras textuales + qué hace en cámara
+     # ── meta ──
+     hashtags_tiktok: list       # list[str]
+     hashtags_reels: list        # list[str]
+     hashtags_shorts: list       # list[str]
+     script_type: str            # "trend" | "howto" | "lifestyle" | "opinion" | "tech" | "fsd"
++
++
++@dataclass
++class Carousel:
++    title: str
++    slides: list        # list[dict] — {"titulo": str, "bullets": list[str]}
++    caption: str
++    hashtags: list      # list[str]
++    carousel_type: str  # "semana_tech" | "tema"
+diff --git a/src/outputs/notion_writer.py b/src/outputs/notion_writer.py
+index 007c1fb..af79f29 100644
+--- a/src/outputs/notion_writer.py
++++ b/src/outputs/notion_writer.py
+@@ -1,13 +1,13 @@
+ from datetime import datetime, timezone
+ from notion_client import Client
+-from src.models import Script
++from src.models import Script, Carousel
+ 
+ _notion = None
+ 
+ 
+ def _get_notion():
+     global _notion
+     if _notion is None:
+         from src.config import settings
+         _notion = Client(auth=settings.NOTION_API_TOKEN)
+     return _notion
+@@ -36,20 +36,46 @@ def write_script(script: Script) -> str:
+             *_modo_director_section(script),
+             _h2("Hashtags"),
+             _p(f"TikTok: {' '.join(script.hashtags_tiktok)}"),
+             _p(f"Reels: {' '.join(script.hashtags_reels)}"),
+             _p(f"Shorts: {' '.join(script.hashtags_shorts)}"),
+         ],
+     )
+     return response["url"]
+ 
+ 
++def write_carousel(carousel: Carousel) -> str:
++    from src.config import settings
++    notion = _get_notion()
++    children = [
++        _h2("Caption sugerido"),
++        _p(carousel.caption),
++        _h2("Hashtags"),
++        _p(" ".join(carousel.hashtags)),
++        _h2("📇 Slides — copia y pega en Canva"),
++    ]
++    for i, slide in enumerate(carousel.slides, 1):
++        children.append(_bold_line(f"Slide {i} — {slide['titulo']}"))
++        children += [_bullet(b) for b in slide["bullets"]]
++    response = notion.pages.create(
++        parent={"database_id": settings.NOTION_DATABASE_ID},
++        properties={
++            "Título": {"title": [{"text": {"content": f"Carrusel: {carousel.title}"[:200]}}]},
++            "Tipo": {"select": {"name": "carrusel"}},
++            "Estado": {"select": {"name": "Pendiente"}},
++            "Fecha": {"date": {"start": datetime.now(timezone.utc).strftime("%Y-%m-%d")}},
++        },
++        children=children,
++    )
++    return response["url"]
++
++
+ def _h2(text: str) -> dict:
+     return {
+         "object": "block", "type": "heading_2",
+         "heading_2": {"rich_text": [{"text": {"content": text}}]},
+     }
+ 
+ 
+ def _p(text: str) -> dict:
+     # Notion hard limit: 2000 chars per rich_text content block
+     text = str(text)[:2000]
+diff --git a/style/banco-ganchos.md b/style/banco-ganchos.md
+new file mode 100644
+index 0000000..8652733
+--- /dev/null
++++ b/style/banco-ganchos.md
+@@ -0,0 +1,180 @@
++# Banco de Ejemplos: Ganchos, CTAs y Engagement
++
++> Este archivo es de EJEMPLOS/REFERENCIA, no de instrucciones. El bot debe 
++> usar estos patrones como banco de opciones a rotar (nunca la misma familia 
++> dos veces seguidas), adaptando el `___` al tema específico del contenido y 
++> ajustando el tono a la voz de Isaac (ver guiones_publicados_isaac.md).
++>
++> Todo gancho debe ser decible/leíble en máximo 2-3 segundos.
++
++---
++
++## 1. GANCHOS (hooks)
++
++### 1.1 Gatillos de reflexión (interrupción de patrón / curiosidad)
++- "¿Qué pasaría si te dijera que...?"
++- "¿Aún no te has enterado de...?"
++- "¿Te gustaría conocer la única cosa que cambió todo sobre ___?"
++- "Esto nadie te lo dice, pero todos lo piensan..."
++- "Te lo digo con cariño, pero alguien tenía que decírtelo:"
++- "¿Por qué nadie está hablando sobre esto?"
++- "¿Estás cometiendo este error sin darte cuenta?"
++- "Quizá este es el error que estás cometiendo sin darte cuenta"
++- "Nadie te ha contado esto..."
++- "Lo que nadie quiere que sepas de ___..."
++- "Si ves esto, es una señal de que..."
++
++### 1.2 Principiantes / tutoriales (enseñar = autoridad)
++- "Cómo empezar con ___ sin sentirte abrumado"
++- "La guía para principiantes que me hubiera gustado tener cuando comencé en ___"
++- "El método de 3 pasos que uso para simplificar ___"
++- "Cómo planifico todo mi proceso de ___ de principio a fin"
++- "Mi flujo de trabajo exacto para ___ (puedes copiarlo)"
++- "Cómo construir un hábito alrededor de ___ que realmente perdure"
++- "El error que comete todo principiante en ___"
++- "Cómo mantener la constancia en ___ sin agotarte"
++- "Las 5 cosas que me hubiera gustado saber antes de empezar ___"
++- "Cómo obtener resultados más rápidos en ___ usando este método"
++
++### 1.3 Consejos, herramientas y hacks (guardables/compartibles)
++- "5 pequeños hábitos que mejoraron mi ___ al instante"
++- "La rutina de 10 minutos que cambió mi forma de abordar ___"
++- "Esta app/herramienta simplificó por completo mi proceso de ___"
++- "3 herramientas para principiantes que uso a diario para ___"
++- "La checklist que sigo antes de cada ___"
++- "La forma perezosa en la que organizo mi ___ (y funciona)"
++- "Cómo reducir a la mitad tu tiempo en ___ sin perder calidad"
++- "Mi sistema paso a paso para mantenerme constante con ___"
++- "La manera más fácil de medir el progreso en ___"
++- "Si siempre olvidas ___, prueba esto"
++
++### 1.4 Ganchos instantáneos (primeros 2-3 segundos)
++- "Todos me dijeron que esto no funcionaría... hasta que funcionó"
++- "Si eres nuevo en ___, necesitas escuchar esto"
++- "Esta es la verdad que nadie te cuenta sobre ___"
++- "Cometí este error durante meses; no hagas lo mismo"
++- "Este pequeño cambio transformó por completo mis resultados"
++- "Probablemente estás haciendo ___ mal (y ni siquiera te das cuenta)"
++- "Pensé que estaría atrapado en ___ para siempre hasta que probé esto"
++- "Ojalá alguien me hubiera dicho esto antes de empezar ___"
++- "Si te sientes perdido en ___, esto fue lo que me ayudó"
++- "Por qué tu ___ no está funcionando (y cómo solucionarlo)"
++- "No lo vas a creer, pero..."
++- "Así fue como lo logré..."
++- "Cómo conseguir ___ sin gastar un peso"
++- "Ya deja de hacer esto con tu ___"
++- "Quédate hasta el final para saber..."
++
++### 1.5 Choque real / dato duro (el que mejor le ha funcionado a Isaac — 
++prioridad alta, basado en sus 3 guiones ya publicados)
++- Contraste noticia verificada + experiencia personal: "Vi que [noticia real] y como futuro ingeniero me pregunté..."
++- Experimento con resultado sorpresivo: "Puse a [herramienta/IA] a decidir ___. El resultado ofendió a media familia."
++- Choque de expectativa: "Todo el mundo está llorando porque ___. Pero después de ver cómo [experiencia real]..."
++- Confesión de escala pequeña con giro grande: "[Número/cifra específica]. Eso es lo que me cuesta/tarda/pasa con ___."
++
++### 1.6 Ganchos para vlog / lifestyle (voz en off sobre clips reales)
++- Abrir con la escena más visual/emotiva del día, sin explicar todavía — 
++  la explicación va en voz en off después
++- "Hoy pasé el día [haciendo X]. Esto fue lo que aprendí."
++- "No planeaba grabar esto, pero pasó algo que quiero compartir."
++
++---
++
++## 2. CALL TO ACTIONS (CTAs)
++
++### 2.1 CTA de utilidad (el que más ha usado y funcionado)
++- "Guarda esto para cuando [situación específica relacionada al tema]"
++- "Mándale esto al que [situación relacionada, con humor]"
++- "Guarda esto si quieres [beneficio directo del contenido]"
++
++### 2.2 CTA de pregunta directa (genera comentarios)
++- "¿Tú qué opinas? Te leo en los comentarios"
++- "¿Tú sabías esto? Cuéntame en comentarios"
++- "¿Estás de acuerdo o crees que [postura contraria]? Te leo abajo"
++- "¿Tienes una historia parecida? Cuéntamela en comentarios"
++- Regla: la pregunta debe ser específica al contenido del video, algo que 
++  SOLO alguien que vio el video completo puede responder — nunca "¿qué 
++  opinas?" suelto sin contexto
++
++### 2.3 CTA indirecto de seguir (nunca decir "sígueme" literal)
++- "Esto lo voy a seguir documentando, se viene la segunda parte"
++- "Voy a estar contando cómo sigue esto en los próximos días"
++- Referencia sutil a que es parte de un ángulo recurrente (ingeniero 
++  explicando tech+vida con este tono), sin anunciarlo — que se sienta por 
++  el estilo, no por un mensaje directo
++- "Si te sirvió esto, por aquí sigo compartiendo cosas así"
++- Para series fijas (ej. "Semana en tech"): mencionar que es una entrega 
++  semanal sin decir "sígueme para la próxima", dejar la expectativa implícita
++
++### 2.4 CTA reflexivo/emocional (contenido personal, tono íntimo)
++- "Confía en el proceso. Y agradece. Siempre agradece."
++- "Si estás pasando por algo ahorita... [validación breve, sin sobre-explicar]"
++- Cierre sin pedir nada, solo dejar la reflexión — el engagement llega solo 
++  cuando el contenido es genuino
++
++### 2.5 CTA para pedir feedback/dirección de contenido
++- "¿Les gustaría que les cuente más de [tema]?"
++- "¿Quieren que les enseñe más de [aspecto específico]? Díganme sí en comentarios"
++- "¿Les interesa ver más de [ángulo de contenido]?"
++
++---
++
++## 3. FORMAS DE PEDIR ENGAGEMENT / PREGUNTAS A LA AUDIENCIA
++
++Para historias (encuestas, cajas de preguntas, stickers de pregunta):
++- "¿Qué quieren que grabe esta semana: [opción A] o [opción B]?"
++- "Pregúntenme lo que quieran de [tema del día]"
++- "¿Cuál de estos dos temas les interesa más: [X] o [Y]?"
++- "Califica del 1 al 10 qué tan de acuerdo estás con [postura del video]"
++
++Regla: usar máximo 1 pregunta por historia/post, nunca combinar varias en 
++el mismo texto (satura y baja la tasa de respuesta).
++
++---
++
++## 4. FORMATOS DE BUENOS DÍAS (rotar, nunca repetir 2 días seguidos)
++
++1. Casual con pregunta: "Buenos días 🤍 ¿qué tal amanecieron?"
++2. Contexto real del día: "Buenos días, hoy toca [entreno 5am / Nestlé / grabar algo nuevo]"
++3. Reflexivo corto: "Buenos días 🤍 Otro día más para intentarlo de nuevo. Vamos con todo."
++4. Directo breve: "Buenos días a todos 🤍☀️"
++
++Formato canción del día: `🎵 Canción del día: [nombre] — [artista]` + 
++opcional 1 línea de razón personal ("esta me tiene enganchado", "la escuché 
++en el gym hoy")
++
++---
++
++## 5. DESCRIPCIONES / CAPTIONS (patrones genéricos por tono)
++
++### Tono simple/directo
++`[Frase central del video, 1 línea]. [emoji opcional]`
++
++### Tono con hashtags de nicho
++```
++[Frase central]
++
++#hashtag1 #hashtag2 #hashtag3 #hashtag4 #hashtag5
++```
++
++### Tono reflexivo (contenido personal)
++```
++[Frase corta de la lección/reflexión central]
++
++[Opcional: segunda línea de contexto breve, sin exponer detalles privados]
++```
++
++### Banco de hashtags por plataforma (rotar según pilar de contenido)
++- **Tech/IA:** #techtok #ia #inteligenciaartificial #tecnologia #innovacion
++- **Carros:** #autos #tesla #teslamexico #autoselectricos #ingenieria
++- **Lifestyle profesional:** #becario #vidaestudiantil #tech #crecimientopersonal
++- **Reflexión/personal:** #motivacion #crecimientopersonal #mentalidad #fe
++
++---
++
++## 6. REGLA DE ROTACIÓN (para el bot)
++
++Antes de generar un gancho o CTA nuevo, el bot debe verificar contra el 
++histórico reciente (últimos 5-7 posts en Notion) para no repetir la misma 
++familia de gancho/CTA dos veces seguidas. Si detecta repetición, debe elegir 
++de una familia distinta o pedirle a Isaac que elija manualmente.
+diff --git a/style/guiones-publicados.md b/style/guiones-publicados.md
+new file mode 100644
+index 0000000..6496f78
+--- /dev/null
++++ b/style/guiones-publicados.md
+@@ -0,0 +1,87 @@
++# Guiones Publicados — Referencia de voz y estilo de Isaac
++
++> Este archivo contiene los guiones que YA fueron grabados y publicados (Estado = "Publicado" en Notion). 
++> Úsalos como few-shot examples de tono, ritmo, estructura de chistes y forma de hablar de Isaac. 
++> No copiar frases textuales en guiones nuevos — usar solo como referencia de estilo.
++
++---
++
++## 1. "Le pregunté a una IA qué carro de mi casa es el mejor"
++**Tipo:** tech | **Estado:** Publicado | **Fecha:** 2026-06-26
++
++### Contexto del tema
++Un experimento de tech+carros donde Isaac usa una IA para comparar los tres coches de su familia, enseñando cómo la IA procesa datos vs. la opinión humana de un ingeniero.
++
++### 🎣 Gancho (0–3 seg)
++Puse a una IA a decidir cuál es el mejor carro de mi casa. El resultado ofendió a media familia.
++
++### 📖 Guión
++A ver, como futuro ingeniero y becario de tecnología, me entró la duda: ¿puede una IA ser objetiva y decirme cuál de los tres carros de la casa es el mejor? Así que le di a Claude todos los datos, sin sentimentalismos: el Swift Sport, el Mini de mi mamá y el Caldermóvil, el Tesla de mi papá. La tarea era simple: dime cuál gana. Y la IA, o sea, se puso en modo SAT: analizó los números fríos, de esos que no entienden de sonrisas por kilómetro. Potencia, 0 a 100, costo por kilómetro, tecnología a bordo. Un checklist de Excel, wey. Su veredicto, obviamente, fue el Caldermóvil. ¿La razón? Es una computadora con ruedas: el más rápido, el más eficiente, el que tiene más pantallas que un cine. Lógico, predecible, aburrido. Aquí es donde la máquina se equivoca. Imagínate que la IA es un nutriólogo que solo ve calorías y macros. Te va a decir que comas pollo hervido con brócoli toda tu vida. Y sí, es lo más "eficiente", pero te estás perdiendo de unos buenos tacos. El Swift y el Mini son esos tacos: no son perfectos en papel, pero la experiencia de manejar manual, de sentir cómo vibra el coche, de escuchar el motor… eso no viene en las especificaciones. La IA eligió el smartphone más avanzado, pero a veces lo que quieres es la consola retro que, aunque pixeleada, es mil veces más divertida. Al final, la IA y mi papá estuvieron de acuerdo. Mi mamá y yo perdimos. Y mi cartera, que solo ajusta para el Swift, pues digamos que prefiere la diversión sobre la eficiencia.
++
++### 📣 Cierre / CTA
++Guarda esto para cuando necesites una opinión experta que no tenga sentimientos... ni licencia de conducir.
++
++### Hashtags
++TikTok: #techtok #ia #inteligenciaartificial #autos #tesla
++
++---
++
++## 2. "Carros Ahogados: ¿Qué se daña primero?"
++**Tipo:** trend | **Estado:** Publicado | **Fecha:** 2026-06-22
++
++### Contexto del tema
++Usando la noticia de las inundaciones en Monterrey, se explica desde una perspectiva de ingeniería qué falla primero en un carro de gasolina vs. uno eléctrico cuando se inunda.
++
++### 🎣 Gancho (0–3 seg)
++Vi los carros ahogados en CDMX y como futuro ingeniero me puse a pensar: ¿qué los mata primero, el agua o la electrónica? Acompañame al gym y te explico.
++
++### 📖 Guión
++A ver, la respuesta rápida es que a los dos se los carga el payaso… pero por razones bien distintas, y aquí es donde se pone bueno. Empecemos con uno de gasolina, como mi Swift. Imagínate que el motor es un nadador: todo su talento depende de respirar bien el aire justo antes de cada braceo —que en el motor sería cada "explosión"—. Bien bonito… hasta que en lugar de aire se da un buen trago de agua y se ahoga a media nadada. Y eso es justo lo que pasa cuando le entra agua al motor: el pistón baja con todo esperando aire, pero se estampa contra el agua, que a diferencia del aire no se deja aplastar ni un milímetro. ¿El resultado? La biela —el bracito que conecta todo— se dobla como popote de Frutsi. En otras palabras: tu nadador se ahogó. A eso los ingenieros le dicen *hydrolock*; en español es: adiós motor, y hola enganche de tu nuevo Olinia.
++
++Ahora el eléctrico. Aquí todos creen que es peor por aquello de "agua más electricidad igual a boom", pero la neta la batería y los motores van sellados con una certificación que se llama *IP67* —el mismo sello de tu celular que sobrevive el clavado al baño—. Son como un tupper de los buenos para que no se salga el caldito. Hasta trae a sus propios chalanes eléctricos que al primer chispazo gritan "¡aguas!" y cortan la corriente solitos.
++
++El verdadero asesino es otro: el carro moderno trae más cables que atrás de tu tele; es como si trajeras una tablet de medio millón de pesos con ruedas. Si a esos sensores y cablecitos les entra agua de la calle —que viene con sal, tierra y tantita coca de piña, hace corto, y después se corroe por dentro durante semanas. O sea, no se muere de un infarto como el de gasolina; se muere como planta que se te olvidó regar: lento, triste y carísimo, hasta volverse el pisapapeles más caro del mundo o sea un olinia.
++
++¿La moraleja de ingeniero? Al agua le vale si tu carro es del futuro o una carcacha. No respeta a nadie.
++
++### 📣 Cierre / CTA
++Guarda esto para que la próxima vez que veas un charco gigante, mejor ni te arriesgues.
++
++### Hashtags
++TikTok: #inundacion #monterrey #autoselectricos #teslamexico #ingenieria
++
++---
++
++## 3. "Guion Reflexión" (contenido personal/emocional)
++**Tipo:** opinion | **Estado:** Publicado
++
++### Contexto del tema
++Video de reflexión personal sobre transformación física, mental y espiritual — tono íntimo, sin gancho tipo carros/tech. Sirve como referencia de cómo Isaac maneja tono emotivo/vulnerable cuando el contenido lo pide, NO como plantilla de tema.
++
++### Guión completo
++Escribí algo que me gustaría compartir. Porque si al menos una persona lo necesita escuchar hoy… entonces valió la pena grabarlo.
++
++Hubo un momento en mi vida donde todo se cayó. No voy a entrar en detalles, pero llegué a un punto donde la ansiedad no me dejaba dormir, no me dejaba pensar, no me dejaba ser yo.
++
++Y lo más duro no fue lo que pasó. Lo más duro fue quedarme solo conmigo mismo y darme cuenta de que la persona que yo era… no era alguien de quien estuviera orgulloso.
++
++Mi mamá me vio en mi peor momento. Y me dijo algo que todavía cargo conmigo todos los días: *"¿Cómo quieres pasar el tiempo? Porque el tiempo no se va a detener por ti. Va a seguir caminando con o sin ti."*
++
++Y esa frase me rompió… pero también me reconstruyó.
++
++[...] Un amigo, Miguel, me dijo algo que repito cada vez que no puedo más: *"No necesitas motivación. Necesitas disciplina. Hay días donde tu cien va a ser tu cincuenta… pero ese cincuenta tiene que ser tu cien."*
++
++Dividí mi cambio en tres cosas: lo físico, lo mental y lo espiritual. [...]
++
++Si estás pasando por algo ahorita… si sientes que ya no puedes… Quiero que sepas que es una mala racha. No es una mala vida. Llora si lo necesitas. Quédate en el piso un rato si hace falta. Pero no te quedes ahí para siempre. Confía en el proceso. Y agradece. Siempre agradece. Aunque duela. Aunque no entiendas. Agradece.
++
++---
++
++## Patrones de voz identificados (para el bot)
++
++- **Muletillas naturales:** "A ver...", "O sea...", "wey", "la neta es que...", "te lo juro"
++- **Analogías cotidianas mexicanas:** nutriólogo/tacos, nadador/motor, tupper/sello IP67, taquero/BYD
++- **Estructura de remate:** casi siempre cierra el bloque de explicación con una frase corta e irónica ("hola enganche de tu nuevo Olinia", "no respeta a nadie")
++- **Referencias recurrentes:** "el Caldermóvil" (Tesla de su papá), Swift Sport (su carro), comparaciones con precios/realidad de becario
++- **Tono:** conversacional, nunca de comercial; explica como si le platicara a un amigo, no como si diera cátedra
++- **Cierre/CTA:** casi siempre "Guarda esto para..." — un CTA de utilidad, no de venta
+diff --git a/style/los-calderas-voice.md b/style/los-calderas-voice.md
+index 7791753..4446c03 100644
+--- a/style/los-calderas-voice.md
++++ b/style/los-calderas-voice.md
+@@ -64,21 +64,21 @@ Reglas: el chiste "becario/precario" es oro, úsalo. Para explicar algo técnico
+ 
+ ## Modo Director — cómo se graba (estilo plática)
+ Todo está pensado para grabar FÁCIL y editar poco:
+ - **Una sola toma continua** es el default: caminando, manejando, o selfie hablando casual.
+ - El **DJI Mic siempre puesto** (buen audio es lo único no negociable). Tripie sobre el tablero para manejar; dron Neo solo si la toma es fácil.
+ - **No es teleprompter**: se le dan 2-3 puntos para que los diga con sus palabras, como contándole a un cuate.
+ - Spots reales de su día (ver contexto-actual): cochera, manejando el Swift, el carro con FSD, plazas, gym, casa.
+ - Si muestra FSD: es supervisado — manos cerca del volante, solo lo enseña un momento.
+ 
+ ## Frases PROHIBIDAS
+-"¡Hola a todos!", "¿Cómo están?", "En el video de hoy", "No olviden suscribirse", "Comenta SÍ o NO", "¿Tú qué opinas?", "Dale like".
++"¡Hola a todos!", "¿Cómo están?", "En el video de hoy", "No olviden suscribirse", "Comenta SÍ o NO", "¿Tú qué opinas?" (suelto; SÍ se permite pregunta directa si es específica al contenido del video), "Dale like".
+ 
+ ---
+ 
+ # Guiones de referencia (SOLO para el TONO — PROHIBIDO copiarlos)
+ 
+ ⚠️ Estos son SOLO para que captures el **tono, el ritmo y cómo se mete el chiste**.
+ **PROHIBIDO reusar su tema, su gancho o sus frases.** Si tu guión se parece a uno de estos —
+ sobre todo al de "En mi casa hay un Tesla" o al de la batería — está MAL: recházalo y haz uno con
+ un ángulo completamente distinto y más creativo. Son la vara de calidad, no plantillas para rellenar.
+ El **Ref 6** es el estándar de oro de humor técnico: copia esa TÉCNICA (metáfora con remate), no su tema.
+diff --git a/tests/brain/test_carousel_generator.py b/tests/brain/test_carousel_generator.py
+new file mode 100644
+index 0000000..8b89c0d
+--- /dev/null
++++ b/tests/brain/test_carousel_generator.py
+@@ -0,0 +1,58 @@
++import json
++from src.brain import carousel_generator as cg
++
++
++_FAKE = json.dumps({
++    "title": "Semana en tech: lo que pasó y por qué importa",
++    "slides": [
++        {"titulo": "Portada: 3 noticias que sí te afectan", "bullets": []},
++        {"titulo": "Apple libera X", "bullets": ["Qué pasó", "Por qué te importa"]},
++        {"titulo": "Cierre", "bullets": ["La próxima entrega el viernes"]},
++    ],
++    "caption": "Lo que pasó esta semana en tech, sin humo.",
++    "hashtags": ["#techtok", "#tecnologia"],
++})
++
++
++def _mock_heavy(mocker):
++    resp = mocker.MagicMock()
++    resp.text = _FAKE
++    return mocker.patch("src.brain.llm_client.heavy", return_value=resp)
++
++
++def test_semana_tech_usa_search_y_parsea(mocker):
++    mock = _mock_heavy(mocker)
++    c = cg.generate_semana_tech()
++    assert mock.call_args[1]["search"] is True
++    assert c.carousel_type == "semana_tech"
++    assert len(c.slides) == 3
++    assert c.slides[1]["bullets"] == ["Qué pasó", "Por qué te importa"]
++
++
++def test_prompt_semana_tech_exige_verificacion(mocker):
++    mock = _mock_heavy(mocker)
++    cg.generate_semana_tech()
++    prompt = mock.call_args[0][0]
++    assert "últimos 7 días" in prompt
++    assert "NO VERIFICADO" in prompt or "no la incluyas" in prompt
++
++
++def test_carousel_tema_toma_del_banco(mocker):
++    _mock_heavy(mocker)
++    c = cg.generate_carousel_tema()
++    assert c.carousel_type == "tema"
++    assert len(cg.CAROUSEL_TOPICS) >= 4
++
++
++def test_semana_tech_inmune_a_llaves_en_voice_guide(mocker):
++    """Regresión: si voice_guide contiene {llaves}, NO debe lanzar KeyError."""
++    mocker.patch(
++        "src.brain.carousel_generator._load_voice_guide",
++        return_value="guia con {llaves} y {script_type} raros",
++    )
++    mock = _mock_heavy(mocker)
++    # No debe tronar
++    cg.generate_semana_tech()
++    prompt = mock.call_args[0][0]
++    # El literal debe llegar intacto al LLM
++    assert "{llaves}" in prompt
+diff --git a/tests/brain/test_ganchos.py b/tests/brain/test_ganchos.py
+new file mode 100644
+index 0000000..28ccf65
+--- /dev/null
++++ b/tests/brain/test_ganchos.py
+@@ -0,0 +1,27 @@
++from src.brain import ganchos
++
++
++def test_howto_incluye_familias_educativas():
++    block = ganchos.build_ganchos_block("howto")
++    assert "principiantes" in block
++    assert "hacks" in block
++    assert "choque_real" not in block  # es para trend/tech/fsd
++
++
++def test_trend_prioriza_choque_real():
++    block = ganchos.build_ganchos_block("trend")
++    assert "choque_real" in block
++    assert "PRIORIDAD ALTA" in block
++
++
++def test_incluye_reglas_de_rotacion_y_ctas():
++    block = ganchos.build_ganchos_block("lifestyle")
++    assert "misma familia dos veces seguidas" in block
++    assert "CTA" in block
++    assert "sígueme" in block  # la regla de nunca decirlo literal
++    assert "2-3 segundos" in block
++
++
++def test_tipo_desconocido_usa_instantaneo():
++    block = ganchos.build_ganchos_block("loquesea")
++    assert "instantaneo" in block
+diff --git a/tests/brain/test_llm_client.py b/tests/brain/test_llm_client.py
+new file mode 100644
+index 0000000..8af35a4
+--- /dev/null
++++ b/tests/brain/test_llm_client.py
+@@ -0,0 +1,26 @@
++from src.brain import llm_client, gemini_client
++
++
++def test_light_uses_flash_sin_search(mocker):
++    mock = mocker.patch("src.brain.gemini_client.call", return_value="r")
++    llm_client.light("hola")
++    kwargs = mock.call_args[1]
++    assert kwargs["model"] == gemini_client.MODEL_FLASH
++    assert kwargs["config"] is None
++
++
++def test_heavy_uses_pro_con_search(mocker):
++    mock = mocker.patch("src.brain.gemini_client.call", return_value="r")
++    llm_client.heavy("hola", search=True)
++    kwargs = mock.call_args[1]
++    assert kwargs["model"] == gemini_client.MODEL_PRO
++    assert kwargs["config"] is gemini_client.SEARCH_CONFIG
++
++
++def test_proveedor_desconocido_truena(mocker):
++    mocker.patch.object(llm_client, "PROVIDER", "openai")
++    try:
++        llm_client.light("hola")
++        assert False, "debió tronar"
++    except NotImplementedError as e:
++        assert "openai" in str(e)
+diff --git a/tests/brain/test_script_generator.py b/tests/brain/test_script_generator.py
+index ca5b7d1..23d3493 100644
+--- a/tests/brain/test_script_generator.py
++++ b/tests/brain/test_script_generator.py
+@@ -117,20 +117,61 @@ def test_append_avoid_hooks_empty_returns_same():
+ 
+ 
+ def test_creatividad_y_anticopia_en_prompt(mocker, tmp_path):
+     _patch_client(mocker, tmp_path, "opinion")
+     prompt = sg._build_prompt("opinion", "tema", "ctx", "")
+     assert "CREATIVIDAD" in prompt
+     assert "ANTI-COPIA" in prompt
+     assert "nambre" in prompt.lower()  # la regla que lo prohíbe como muletilla
+ 
+ 
++def test_guiones_publicados_en_prompt(mocker, tmp_path):
++    _patch_client(mocker, tmp_path, "howto")
++    pub = tmp_path / "pub.md"
++    pub.write_text("MARCA-VOZ-PUBLICADA nutriologo tacos", encoding="utf-8")
++    mocker.patch("src.brain.script_generator.GUIONES_PUBLICADOS_PATH", str(pub))
++    sg._file_cache = {}
++    voice_file = tmp_path / "los-calderas-voice.md"
++    mocker.patch("src.brain.script_generator.VOICE_GUIDE_PATH", str(voice_file))
++    prompt = sg._build_prompt("howto", "t", "c", "")
++    assert "MARCA-VOZ-PUBLICADA" in prompt
++    assert "GUIONES YA PUBLICADOS" in prompt
++
++
++def test_ganchos_block_en_prompt(mocker, tmp_path):
++    _patch_client(mocker, tmp_path, "trend")
++    prompt = sg._build_prompt("trend", "t", "c", "")
++    assert "LIBRERÍA DE GANCHOS" in prompt
++    assert "choque_real" in prompt
++
++
++def test_generate_vlog_returns_script(mocker, tmp_path):
++    _patch_client(mocker, tmp_path, "vlog")
++    script = sg.generate_vlog()
++    assert script.script_type == "vlog"
++    assert script.hook != ""
++
++
++def test_sin_videojuegos_en_bancos():
++    todos = sg._LIFESTYLE_TOPICS + sg._OPINION_TOPICS + sg._HOWTO_TOPICS + sg._TECH_TOPICS + sg._FSD_TOPICS + sg._VLOG_TOPICS
++    texto = " ".join(t["title"] + t["context"] for t in todos).lower()
++    for palabra in ["assetto", "beamng", "videojuego", "simulador"]:
++        assert palabra not in texto, f"'{palabra}' sigue en un banco de temas"
++
++
++def test_regla_verificacion_en_prompt(mocker, tmp_path):
++    _patch_client(mocker, tmp_path, "trend")
++    prompt = sg._build_prompt("trend", "t", "c", "")
++    assert "NO VERIFICADO" in prompt
++    assert "7-14 días" in prompt
++
++
+ def test_contexto_actual_injected_into_prompt(mocker, tmp_path):
+     mock = _patch_client(mocker, tmp_path, "howto")
+     mocker.patch("src.brain.script_generator.CONTEXTO_ACTUAL_PATH", str(tmp_path / "ctx.md"))
+     (tmp_path / "ctx.md").write_text("VACACIONES hasta el 15 de agosto. NO menciones la escuela.")
+     sg._file_cache = {}
+     # re-patch voice after cache clear
+     voice_file = tmp_path / "los-calderas-voice.md"
+     mocker.patch("src.brain.script_generator.VOICE_GUIDE_PATH", str(voice_file))
+     sg.generate_howto()
+     prompt = mock.models.generate_content.call_args[1]["contents"]
+diff --git a/tests/outputs/test_notion_writer.py b/tests/outputs/test_notion_writer.py
+index 2c94d7a..2c0feea 100644
+--- a/tests/outputs/test_notion_writer.py
++++ b/tests/outputs/test_notion_writer.py
+@@ -1,12 +1,12 @@
+ from unittest.mock import MagicMock
+-from src.models import Script
++from src.models import Script, Carousel
+ from src.outputs import notion_writer as nw
+ 
+ 
+ def _make_script():
+     return Script(
+         title="Semana sin tocar el volante",
+         topic_context="FSD en CDMX, prueba real",
+         hook="No manches... llevo cinco días sin tocar esto",
+         body="Todo empezó el lunes...",
+         cta="Guarda esto para cuando alguien te diga que los eléctricos no sirven",
+@@ -27,10 +27,37 @@ def test_write_script_calls_notion_and_returns_url(mocker):
+     mocker.patch("notion_client.Client", return_value=mock_notion)
+     nw._notion = mock_notion
+ 
+     url = nw.write_script(_make_script())
+ 
+     assert url == "https://notion.so/page123"
+     mock_notion.pages.create.assert_called_once()
+     call_kwargs = mock_notion.pages.create.call_args[1]
+     assert "children" in call_kwargs
+     assert len(call_kwargs["children"]) > 0
++
++
++def test_write_carousel_crea_pagina_ordenada(mocker):
++    mock_notion = MagicMock()
++    mock_notion.pages.create.return_value = {"url": "https://notion.so/carr1"}
++    nw._notion = mock_notion
++
++    c = Carousel(
++        title="Semana en tech: 30 jun - 4 jul",
++        slides=[
++            {"titulo": "Portada", "bullets": []},
++            {"titulo": "Noticia 1", "bullets": ["qué pasó", "por qué te importa"]},
++        ],
++        caption="La semana sin humo.",
++        hashtags=["#techtok"],
++        carousel_type="semana_tech",
++    )
++    url = nw.write_carousel(c)
++
++    assert url == "https://notion.so/carr1"
++    kwargs = mock_notion.pages.create.call_args[1]
++    titulo = kwargs["properties"]["Título"]["title"][0]["text"]["content"]
++    assert titulo == "Carrusel: Semana en tech: 30 jun - 4 jul"
++    assert kwargs["properties"]["Tipo"]["select"]["name"] == "carrusel"
++    contenido = str(kwargs["children"])
++    assert "Slide 1" in contenido and "Slide 2" in contenido
++    assert "por qué te importa" in contenido
+diff --git a/tests/test_e2e_contenido.py b/tests/test_e2e_contenido.py
+new file mode 100644
+index 0000000..7f6180e
+--- /dev/null
++++ b/tests/test_e2e_contenido.py
+@@ -0,0 +1,58 @@
++"""E2E con mocks: un contenido de cada tipo pasa completo por generación → Notion.
++(Historias diarias quedan para la Fase 2 — chatbot — según decisión de Isaac.)"""
++import json
++from unittest.mock import MagicMock
++from src.brain import script_generator as sg
++from src.brain import carousel_generator as cg
++from src.outputs import notion_writer as nw
++
++
++def _fake_script(script_type):
++    return json.dumps({
++        "title": "t", "topic_context": "c", "hook": "h", "body": "b" * 200, "cta": "cta",
++        "spot": "s", "como_grabar": "cg", "puntos": ["p1"], "arranque": "a",
++        "hashtags_tiktok": ["#x"], "hashtags_reels": [], "hashtags_shorts": [],
++        "script_type": script_type,
++    })
++
++
++def _fake_carousel():
++    return json.dumps({
++        "title": "Semana en tech", "caption": "cap", "hashtags": ["#t"],
++        "slides": [{"titulo": "Portada", "bullets": []}, {"titulo": "N1", "bullets": ["b"]}],
++    })
++
++
++def test_e2e_reel_hasta_notion(mocker, tmp_path):
++    resp = mocker.MagicMock(); resp.text = _fake_script("howto")
++    mocker.patch("src.brain.llm_client.heavy", return_value=resp)
++    sg._file_cache = {}
++    mock_notion = MagicMock()
++    mock_notion.pages.create.return_value = {"url": "https://notion.so/x"}
++    nw._notion = mock_notion
++
++    script = sg.generate_howto()
++    url = nw.write_script(script)
++    assert url.startswith("https://notion.so/")
++    assert mock_notion.pages.create.call_args[1]["properties"]["Tipo"]["select"]["name"] == "howto"
++
++
++def test_e2e_vlog_hasta_notion(mocker):
++    resp = mocker.MagicMock(); resp.text = _fake_script("vlog")
++    mocker.patch("src.brain.llm_client.heavy", return_value=resp)
++    sg._file_cache = {}
++    mock_notion = MagicMock()
++    mock_notion.pages.create.return_value = {"url": "https://notion.so/v"}
++    nw._notion = mock_notion
++    url = nw.write_script(sg.generate_vlog())
++    assert url == "https://notion.so/v"
++
++
++def test_e2e_carrusel_hasta_notion(mocker):
++    resp = mocker.MagicMock(); resp.text = _fake_carousel()
++    mocker.patch("src.brain.llm_client.heavy", return_value=resp)
++    mock_notion = MagicMock()
++    mock_notion.pages.create.return_value = {"url": "https://notion.so/c"}
++    nw._notion = mock_notion
++    url = nw.write_carousel(cg.generate_semana_tech())
++    assert url == "https://notion.so/c"
