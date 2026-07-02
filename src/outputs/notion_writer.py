@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from notion_client import Client
-from src.models import Script
+from src.models import Script, Carousel
 
 _notion = None
 
@@ -39,6 +39,32 @@ def write_script(script: Script) -> str:
             _p(f"Reels: {' '.join(script.hashtags_reels)}"),
             _p(f"Shorts: {' '.join(script.hashtags_shorts)}"),
         ],
+    )
+    return response["url"]
+
+
+def write_carousel(carousel: Carousel) -> str:
+    from src.config import settings
+    notion = _get_notion()
+    children = [
+        _h2("Caption sugerido"),
+        _p(carousel.caption),
+        _h2("Hashtags"),
+        _p(" ".join(carousel.hashtags)),
+        _h2("📇 Slides — copia y pega en Canva"),
+    ]
+    for i, slide in enumerate(carousel.slides, 1):
+        children.append(_bold_line(f"Slide {i} — {slide['titulo']}"))
+        children += [_bullet(b) for b in slide["bullets"]]
+    response = notion.pages.create(
+        parent={"database_id": settings.NOTION_DATABASE_ID},
+        properties={
+            "Título": {"title": [{"text": {"content": f"Carrusel: {carousel.title}"[:200]}}]},
+            "Tipo": {"select": {"name": "carrusel"}},
+            "Estado": {"select": {"name": "Pendiente"}},
+            "Fecha": {"date": {"start": datetime.now(timezone.utc).strftime("%Y-%m-%d")}},
+        },
+        children=children,
     )
     return response["url"]
 
