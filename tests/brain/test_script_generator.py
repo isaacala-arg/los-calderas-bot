@@ -137,6 +137,13 @@ def test_guiones_publicados_en_prompt(mocker, tmp_path):
     assert "GUIONES YA PUBLICADOS" in prompt
 
 
+def test_ganchos_block_en_prompt(mocker, tmp_path):
+    _patch_client(mocker, tmp_path, "trend")
+    prompt = sg._build_prompt("trend", "t", "c", "")
+    assert "LIBRERÍA DE GANCHOS" in prompt
+    assert "choque_real" in prompt
+
+
 def test_contexto_actual_injected_into_prompt(mocker, tmp_path):
     mock = _patch_client(mocker, tmp_path, "howto")
     mocker.patch("src.brain.script_generator.CONTEXTO_ACTUAL_PATH", str(tmp_path / "ctx.md"))

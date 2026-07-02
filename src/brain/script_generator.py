@@ -3,6 +3,7 @@ import os
 import random
 from datetime import datetime, timezone
 from src.brain import llm_client
+from src.brain.ganchos import build_ganchos_block
 from src.models import Article, Script
 
 _STYLE_DIR = os.path.join(os.path.dirname(__file__), "../../style")
@@ -299,6 +300,7 @@ def _build_prompt(script_type: str, title: str, context: str, canal_context: str
         )
     if canal_context:
         sections.append("---\nCONTEXTO DEL CANAL:\n" + canal_context)
+    sections.append("---\n" + build_ganchos_block(script_type))
     sections.append(_COMMON.format(script_type=script_type))
     return "\n\n".join(sections)
 
