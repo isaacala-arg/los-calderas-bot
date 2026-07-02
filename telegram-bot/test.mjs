@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   detectarIntent, siguienteVariante, extraerTema,
   sugerirContenido, formatearCancion, BUENOS_DIAS,
+  construirFiltroNotion, contarPorTipo,
 } from "./worker.js";
 
 test("detectarIntent clasifica los comandos de Isaac", () => {
@@ -64,4 +65,20 @@ test("detectarIntent: formas explícitas SÍ disparan guion con tema", () => {
   assert.equal(detectarIntent("hazme un guión de los aranceles").tipo, "guion");
   assert.equal(detectarIntent("quiero un guion sobre el FSD en CDMX").tipo, "guion");
   assert.equal(detectarIntent("hazme un guion").arg, "");
+});
+
+test("construirFiltroNotion pide Fecha de los últimos 7 días", () => {
+  const f = construirFiltroNotion(new Date("2026-07-02T12:00:00Z"));
+  assert.equal(f.filter.property, "Fecha");
+  assert.equal(f.filter.date.on_or_after, "2026-06-26");
+});
+
+test("contarPorTipo agrupa por el select Tipo", () => {
+  const paginas = [
+    { properties: { Tipo: { select: { name: "trend" } } } },
+    { properties: { Tipo: { select: { name: "trend" } } } },
+    { properties: { Tipo: { select: null } } },
+    { properties: { Tipo: { select: { name: "carrusel" } } } },
+  ];
+  assert.deepEqual(contarPorTipo(paginas), { trend: 2, carrusel: 1 });
 });

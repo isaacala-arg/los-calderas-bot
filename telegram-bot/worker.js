@@ -72,12 +72,79 @@ export function formatearCancion(arg) {
   return `🎵 Canción del día: ${cuerpo}`;
 }
 
-// ─── Integraciones (Task 2 las implementa; aquí stubs que fallan claro) ───────
-async function llamarLLM(env, prompt, tier) { throw new Error("llamarLLM: pendiente Task 2"); }
-async function consultarNotion(env) { throw new Error("consultarNotion: pendiente Task 2"); }
-async function dispararGuion(env, tema) { throw new Error("dispararGuion: pendiente Task 2"); }
-async function leerEstado(env, key) { return null; }
-async function guardarEstado(env, key, valor) {}
+// ─── Integraciones (Task 2) ───────────────────────────────────────────────────
+
+async function llamarLLM(env, prompt, tier) {
+  if ((env.LLM_PROVIDER || "gemini") !== "gemini")
+    return `Proveedor LLM '${env.LLM_PROVIDER}' no implementado — configura el adapter en worker.js`;
+  const model = tier === "heavy" ? env.MODEL_HEAVY : env.MODEL_LIGHT;
+  const r = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.LLM_API_KEY}`,
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+    }
+  );
+  if (!r.ok) throw new Error(`LLM ${r.status}: ${(await r.text()).slice(0, 200)}`);
+  const data = await r.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "(sin respuesta del modelo)";
+}
+
+export function construirFiltroNotion(hoy) {
+  const desde = new Date(hoy.getTime() - 6 * 24 * 60 * 60 * 1000);
+  return {
+    filter: { property: "Fecha", date: { on_or_after: desde.toISOString().slice(0, 10) } },
+    page_size: 50,
+  };
+}
+
+export function contarPorTipo(paginas) {
+  const conteos = {};
+  for (const p of paginas) {
+    const tipo = p.properties?.Tipo?.select?.name;
+    if (tipo) conteos[tipo] = (conteos[tipo] || 0) + 1;
+  }
+  return conteos;
+}
+
+async function consultarNotion(env) {
+  const r = await fetch(`https://api.notion.com/v1/databases/${env.NOTION_DATABASE_ID}/query`, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${env.NOTION_API_TOKEN}`,
+      "content-type": "application/json",
+      "Notion-Version": "2022-06-28",
+    },
+    body: JSON.stringify(construirFiltroNotion(new Date())),
+  });
+  if (!r.ok) throw new Error(`Notion ${r.status}`);
+  return contarPorTipo((await r.json()).results || []);
+}
+
+async function dispararGuion(env, tema) {
+  const r = await fetch(
+    `https://api.github.com/repos/${env.GITHUB_REPO}/actions/workflows/custom-topic.yml/dispatches`,
+    {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${env.GITHUB_TOKEN}`,
+        accept: "application/vnd.github+json",
+        "user-agent": "los-calderas-telegram",
+      },
+      body: JSON.stringify({ ref: "main", inputs: { tema } }),
+    }
+  );
+  if (r.status !== 204) throw new Error(`GitHub ${r.status}: ${(await r.text()).slice(0, 200)}`);
+}
+
+async function leerEstado(env, key) {
+  return env.ESTADO ? env.ESTADO.get(key) : null;
+}
+
+async function guardarEstado(env, key, valor) {
+  if (env.ESTADO) await env.ESTADO.put(key, valor);
+}
 
 // ─── Telegram plumbing ────────────────────────────────────────────────────────
 async function responder(env, chatId, texto) {
@@ -126,6 +193,15 @@ const PROMPT_CHAT = `Eres el asistente de contenido de Isaac ("Los Calderas": ca
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === "/setup" && request.method === "GET") {
+      if (url.searchParams.get("secret") !== env.TELEGRAM_SECRET)
+        return new Response("forbidden", { status: 403 });
+      const hook = `${url.origin}/webhook`;
+      const r = await fetch(
+        `https://api.telegram.org/bot${env.TELEGRAM_TOKEN}/setWebhook?url=${encodeURIComponent(hook)}&secret_token=${env.TELEGRAM_SECRET}`
+      );
+      return new Response(await r.text(), { headers: { "content-type": "application/json" } });
+    }
     if (url.pathname === "/webhook" && request.method === "POST") {
       if (request.headers.get("X-Telegram-Bot-Api-Secret-Token") !== env.TELEGRAM_SECRET)
         return new Response("forbidden", { status: 403 });
