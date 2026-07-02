@@ -2,7 +2,7 @@ import json
 import os
 import random
 from datetime import datetime, timezone
-from src.brain import gemini_client
+from src.brain import llm_client
 from src.models import Article, Script
 
 _STYLE_DIR = os.path.join(os.path.dirname(__file__), "../../style")
@@ -300,9 +300,7 @@ def generate(article: Article, script_type: str = "trend", canal_context: str = 
     prompt = _build_prompt(script_type, article.title, article.summary, canal_context)
     # Grounding (búsqueda en Google) solo para noticias/tendencias y tech, que
     # se benefician de datos actuales. Los demás usan temas del banco.
-    config = gemini_client.SEARCH_CONFIG if script_type in ("trend", "tech", "evergreen") else None
-    # Guiones = tarea creativa → modelo PRO (más inteligente para humor y tono).
-    response = gemini_client.call(prompt, config=config, model=gemini_client.MODEL_PRO)
+    response = llm_client.heavy(prompt, search=script_type in ("trend", "tech", "evergreen"))
     return _parse_response(response, script_type)
 
 

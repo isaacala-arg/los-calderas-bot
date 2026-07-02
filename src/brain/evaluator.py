@@ -1,5 +1,5 @@
 import json
-from src.brain import gemini_client
+from src.brain import llm_client
 from src.models import EvaluationResult
 
 _PROMPT = """
@@ -65,7 +65,7 @@ def evaluate(articles: list, trends: list | None = None) -> EvaluationResult:
         articles_text=articles_text,
         trends_block=_build_trends_block(trends),
     )
-    response = gemini_client.call(prompt)
+    response = llm_client.light(prompt)
     raw = response.text.strip()
     if raw.startswith("```"):
         raw = raw.split("```")[1]

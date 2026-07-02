@@ -3,7 +3,7 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.brain import gemini_client
+from src.brain import llm_client
 from src.brain.script_generator import generate, build_canal_context
 from src.outputs.notion_writer import write_script
 from src.outputs.notion_reader import get_recent_titles, get_approved_examples
@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 
 
 def research_topic(topic: str) -> Article:
-    response = gemini_client.call(
+    response = llm_client.light(
         f"""Investiga este tema buscando en internet para el canal automotriz mexicano "Los Calderas":
 
 TEMA: {topic}
@@ -25,7 +25,7 @@ Busca información actual y proporciona un resumen factual que incluya:
 - Solo si aplica directamente: cómo afecta a dueños de Tesla, Mini o Suzuki Swift
 
 Responde en español, 4-5 párrafos, tono informativo y preciso. Prioriza datos verificables sobre especulación.""",
-        config=gemini_client.SEARCH_CONFIG,
+        search=True,
     )
     return Article(
         title=topic,
