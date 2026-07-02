@@ -124,6 +124,19 @@ def test_creatividad_y_anticopia_en_prompt(mocker, tmp_path):
     assert "nambre" in prompt.lower()  # la regla que lo prohíbe como muletilla
 
 
+def test_guiones_publicados_en_prompt(mocker, tmp_path):
+    _patch_client(mocker, tmp_path, "howto")
+    pub = tmp_path / "pub.md"
+    pub.write_text("MARCA-VOZ-PUBLICADA nutriologo tacos", encoding="utf-8")
+    mocker.patch("src.brain.script_generator.GUIONES_PUBLICADOS_PATH", str(pub))
+    sg._file_cache = {}
+    voice_file = tmp_path / "los-calderas-voice.md"
+    mocker.patch("src.brain.script_generator.VOICE_GUIDE_PATH", str(voice_file))
+    prompt = sg._build_prompt("howto", "t", "c", "")
+    assert "MARCA-VOZ-PUBLICADA" in prompt
+    assert "GUIONES YA PUBLICADOS" in prompt
+
+
 def test_contexto_actual_injected_into_prompt(mocker, tmp_path):
     mock = _patch_client(mocker, tmp_path, "howto")
     mocker.patch("src.brain.script_generator.CONTEXTO_ACTUAL_PATH", str(tmp_path / "ctx.md"))

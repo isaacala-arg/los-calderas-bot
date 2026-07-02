@@ -8,6 +8,7 @@ from src.models import Article, Script
 _STYLE_DIR = os.path.join(os.path.dirname(__file__), "../../style")
 VOICE_GUIDE_PATH = os.path.join(_STYLE_DIR, "los-calderas-voice.md")
 CONTEXTO_ACTUAL_PATH = os.path.join(_STYLE_DIR, "contexto-actual.md")
+GUIONES_PUBLICADOS_PATH = os.path.join(_STYLE_DIR, "guiones-publicados.md")
 
 # ─── INSTRUCCIONES COMUNES (DRY — se inyectan en todos los tipos) ──────────────
 _COMMON = """
@@ -290,6 +291,12 @@ def _build_prompt(script_type: str, title: str, context: str, canal_context: str
     ]
     if contexto_actual:
         sections.append("---\nCONTEXTO ACTUAL DE ISAAC (adapta el tema a esto):\n" + contexto_actual)
+    guiones_publicados = _load_file(GUIONES_PUBLICADOS_PATH)
+    if guiones_publicados:
+        sections.append(
+            "---\nGUIONES YA PUBLICADOS POR ISAAC (voz real — imita el tono, el ritmo y los "
+            "patrones; PROHIBIDO copiar frases o temas):\n" + guiones_publicados
+        )
     if canal_context:
         sections.append("---\nCONTEXTO DEL CANAL:\n" + canal_context)
     sections.append(_COMMON.format(script_type=script_type))

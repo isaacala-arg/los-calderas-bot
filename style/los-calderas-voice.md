@@ -71,7 +71,7 @@ Todo está pensado para grabar FÁCIL y editar poco:
 - Si muestra FSD: es supervisado — manos cerca del volante, solo lo enseña un momento.
 
 ## Frases PROHIBIDAS
-"¡Hola a todos!", "¿Cómo están?", "En el video de hoy", "No olviden suscribirse", "Comenta SÍ o NO", "¿Tú qué opinas?", "Dale like".
+"¡Hola a todos!", "¿Cómo están?", "En el video de hoy", "No olviden suscribirse", "Comenta SÍ o NO", "¿Tú qué opinas?" (suelto; SÍ se permite pregunta directa si es específica al contenido del video), "Dale like".
 
 ---
 
