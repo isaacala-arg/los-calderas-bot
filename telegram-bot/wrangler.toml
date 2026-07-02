@@ -1,0 +1,15 @@
+name = "los-calderas-telegram"
+main = "worker.js"
+compatibility_date = "2026-06-01"
+
+[[kv_namespaces]]
+binding = "ESTADO"
+id = "REEMPLAZAR_CON_ID_DE_KV"   # se crea con: npx wrangler kv namespace create ESTADO
+
+[vars]
+LLM_PROVIDER = "gemini"
+MODEL_LIGHT = "gemini-2.5-flash"
+MODEL_HEAVY = "gemini-2.5-pro"
+GITHUB_REPO = "isaacala-arg/los-calderas-bot"
+# Secrets (npx wrangler secret put X): TELEGRAM_TOKEN, TELEGRAM_SECRET,
+# ALLOWED_CHAT_ID, LLM_API_KEY, GITHUB_TOKEN, NOTION_API_TOKEN, NOTION_DATABASE_ID
