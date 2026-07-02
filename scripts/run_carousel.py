@@ -11,6 +11,7 @@ def main():
         topic = next((t for t in CAROUSEL_TOPICS if wanted in t["title"].lower()), None)
         if topic is None:
             print(f"AVISO: '{wanted}' no está en el banco; usando uno al azar")
+    print("Generando carrusel por tema...")
     carousel = generate_carousel_tema(topic)
     url = write_carousel(carousel)
     print(f"Carrusel guardado en Notion: {url}")
