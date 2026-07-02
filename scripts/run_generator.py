@@ -11,7 +11,7 @@ from src.sources.trends_fetcher import fetch_trends
 from src.brain.evaluator import evaluate
 from src.brain.script_generator import (
     generate, generate_howto, generate_lifestyle, generate_opinion,
-    generate_tech, generate_fsd, build_canal_context, append_avoid_hooks,
+    generate_tech, generate_fsd, generate_vlog, build_canal_context, append_avoid_hooks,
 )
 from src.outputs.notion_writer import write_script
 from src.outputs.notion_reader import get_recent_titles, get_approved_examples
@@ -78,8 +78,8 @@ def main():
     url2 = write_script(script2)
     print(f"[2/3] {script2.script_type.capitalize()} script saved: {url2}")
 
-    # Script 3: pilar "personal/formato" — rota entre lifestyle y FSD+listicle.
-    personal_rotation = [generate_lifestyle, generate_fsd]
+    # Script 3: pilar "personal/formato" — rota entre lifestyle, vlog y FSD+listicle.
+    personal_rotation = [generate_lifestyle, generate_vlog, generate_fsd]
     ctx3 = append_avoid_hooks(canal_context, used_hooks)
     script3 = personal_rotation[date.today().weekday() % len(personal_rotation)](canal_context=ctx3)
     url3 = write_script(script3)

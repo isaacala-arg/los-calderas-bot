@@ -21,6 +21,11 @@ No lo rellenes con paja: cada oración debe enseñar algo o dar risa.
 
 REGLA DE ORO: el video tiene que ENSEÑAR algo útil Y dar risa. Si no cumple ambas, reescríbelo.
 
+VERIFICACIÓN (no negociable): cualquier dato o noticia debe venir de la búsqueda web o del
+contexto dado — NUNCA lo inventes. Si un dato no se puede verificar, escríbelo explícito en
+"topic_context" con la marca "DATO NO VERIFICADO". Para noticias, usa solo de los últimos
+7-14 días; nunca recicles anuncios viejos como nuevos.
+
 HUMOR (densidad alta, estilo aprobado por Isaac — ver Ref 6 del voice guide):
 - Para explicar CUALQUIER cosa técnica, usa una metáfora cotidiana mexicana, nunca el término a secas.
   Ej: el motor que se ahoga = un clavadista; sellado IP67 = tu celular que aguanta el clavado al baño;
@@ -117,6 +122,13 @@ _TYPE_GUIDANCE = {
     "evergreen": (
         "TIPO: HOW-TO o OPINIÓN atemporal de carros/tech con datos reales."
     ),
+    "vlog": (
+        "TIPO: VLOG con VOZ EN OFF sobre clips reales del día de Isaac. El campo 'body' es el "
+        "guion de la VOZ EN OFF (se graba encima de los clips, tono reflexivo pero con humor). "
+        "El gancho es la escena más visual/emotiva del día SIN explicarla aún. El campo 'puntos' "
+        "es la LISTA DE CLIPS que Isaac debe grabar durante el día (cortos, fáciles: llegando a la "
+        "oficina, el gym, manejando el Swift). Cierre con pregunta/reflexión que invite a comentar."
+    ),
 }
 
 # ─── BANCOS DE TEMAS ──────────────────────────────────────────────────────────
@@ -134,7 +146,6 @@ _LIFESTYLE_TOPICS = [
     {"title": "POV: eres becario y el único carro libre es el de tu papá", "context": "POV/situación: el dilema de agarrar el Caldermóvil (Tesla de papá) vs su Swift. Humor becario/precario, pedir permiso, la presión de no rayarlo."},
     {"title": "Mi rutina de becario en vacaciones que nadie pidió ver", "context": "Día real con autoburla: home office desde las 8 en pijama, café recalentado 3 veces, gym a las 3 (a veces caminando), proyecto de ciber en la noche. El chiste becario/precario."},
     {"title": "Manejar al gym es mi terapia más barata", "context": "Pedazo honesto: el trayecto al gym con su música es lo único del día sin notificaciones. Conecta cambio físico + carro + salud mental, con humor."},
-    {"title": "Lo que Assetto Corsa NO te prepara para manejar en CDMX", "context": "Comparación con giro: Isaac juega el simulador y muestra qué sí y qué definitivamente NO te prepara (topes, microbuses, el tío en sentido contrario). Humor de ingeniero gamer."},
     {"title": "Ranking de los 3 carros de mi familia según para qué sirven", "context": "Ranking con giro: Swift (suyo), Caldermóvil (de papá), Mini (de mamá), cada uno gana en una categoría inesperada. Honesto y divertido, sin decir 'mi Tesla'."},
 ]
 
@@ -158,6 +169,13 @@ _FSD_TOPICS = [
     {"title": "Dejé que el Tesla me llevara a cualquier lado por un café", "context": "FSD + storytelling: Isaac aburrido le pide a Grok/FSD que lo lleve por un café y mientras cuenta 5 datos curiosos de él. Muestra que el carro maneja solo."},
     {"title": "Califiqué a los conductores de CDMX mientras el Tesla manejaba solo", "context": "FSD + bit: con las manos libres (supervisado), Isaac narra y califica con humor las maniobras locas del tráfico de CDMX que el FSD tiene que esquivar."},
     {"title": "Las monerías del Tesla que nadie te muestra así", "context": "Reveal creativo: features cool del Caldermóvil (modo centinela, bocina, front, juegos) mostrados de forma divertida y rápida, no como reseña aburrida."},
+]
+
+_VLOG_TOPICS = [
+    {"title": "Un día real de becario de tecnología (voz en off)", "context": "Clips del día: despertarse, home office u oficina, gym, noche trabajando en su proyecto. Voz en off honesta sobre lo que nadie cuenta de ser becario a los 20."},
+    {"title": "Del gym a la chamba: así se ve mi cambio físico", "context": "Clips de entreno + rutina diaria. Voz en off sobre disciplina vs motivación ('tu cincuenta tiene que ser tu cien'), sin sermón."},
+    {"title": "Grabé todo lo que hice un viernes (y por qué el Swift es parte)", "context": "Clips del viernes: oficina, tráfico en el Swift, gym, noche. Voz en off con humor de ingeniero sobre la rutina real."},
+    {"title": "Lo que aprendí esta semana (recap personal)", "context": "Clips sueltos de la semana. Voz en off: 2-3 aprendizajes concretos de chamba/gym/proyecto con remate de humor."},
 ]
 
 
@@ -343,6 +361,10 @@ def generate_tech(canal_context: str = "") -> Script:
 
 def generate_fsd(canal_context: str = "") -> Script:
     return _generate_from_bank(_FSD_TOPICS, "fsd", canal_context)
+
+
+def generate_vlog(canal_context: str = "") -> Script:
+    return _generate_from_bank(_VLOG_TOPICS, "vlog", canal_context)
 
 
 def generate_evergreen(canal_context: str = "") -> Script:

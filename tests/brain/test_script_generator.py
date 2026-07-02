@@ -144,6 +144,27 @@ def test_ganchos_block_en_prompt(mocker, tmp_path):
     assert "choque_real" in prompt
 
 
+def test_generate_vlog_returns_script(mocker, tmp_path):
+    _patch_client(mocker, tmp_path, "vlog")
+    script = sg.generate_vlog()
+    assert script.script_type == "vlog"
+    assert script.hook != ""
+
+
+def test_sin_videojuegos_en_bancos():
+    todos = sg._LIFESTYLE_TOPICS + sg._OPINION_TOPICS + sg._HOWTO_TOPICS + sg._TECH_TOPICS + sg._FSD_TOPICS + sg._VLOG_TOPICS
+    texto = " ".join(t["title"] + t["context"] for t in todos).lower()
+    for palabra in ["assetto", "beamng", "videojuego", "simulador"]:
+        assert palabra not in texto, f"'{palabra}' sigue en un banco de temas"
+
+
+def test_regla_verificacion_en_prompt(mocker, tmp_path):
+    _patch_client(mocker, tmp_path, "trend")
+    prompt = sg._build_prompt("trend", "t", "c", "")
+    assert "NO VERIFICADO" in prompt
+    assert "7-14 días" in prompt
+
+
 def test_contexto_actual_injected_into_prompt(mocker, tmp_path):
     mock = _patch_client(mocker, tmp_path, "howto")
     mocker.patch("src.brain.script_generator.CONTEXTO_ACTUAL_PATH", str(tmp_path / "ctx.md"))
