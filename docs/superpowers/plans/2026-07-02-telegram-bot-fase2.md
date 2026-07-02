@@ -11,7 +11,7 @@
 ## Global Constraints
 
 - Todo vive en `telegram-bot/` dentro del repo `C:\Users\Isaac\Documents\los-calderas-bot` (rama main).
-- Tests: `node --test telegram-bot/` (auto-descubre `worker.test.mjs`) desde la raíz — deben pasar SIN red ni secrets (solo funciones puras).
+- Tests: `node --test telegram-bot/worker.test.mjs` desde la raíz — deben pasar SIN red ni secrets (solo funciones puras).
 - Worker sin dependencias npm ni paso de build (un archivo, `fetch` nativo).
 - Routing de modelos: light=`gemini-2.5-flash` (historias, chat, frases), heavy=`gemini-2.5-pro` (nada lo usa aún en el worker — los guiones pesados se delegan al repo vía GitHub). Proveedor por var `LLM_PROVIDER` (default `gemini`); otro proveedor → responder error claro, no tronar silencioso.
 - Seguridad NO negociable: (1) validar header `X-Telegram-Bot-Api-Secret-Token` contra `TELEGRAM_SECRET`; (2) ignorar mensajes cuyo `chat.id` ≠ `ALLOWED_CHAT_ID`.
@@ -98,7 +98,7 @@ test("formatearCancion con y sin canción", () => {
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `node --test telegram-bot/` (auto-descubre `worker.test.mjs`)
+Run: `node --test telegram-bot/worker.test.mjs`
 Expected: FAIL — `Cannot find module ... worker.js`
 
 - [ ] **Step 3: Write the worker (v1 con stubs)**
@@ -259,7 +259,7 @@ GITHUB_REPO = "isaacala-arg/los-calderas-bot"
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `node --test telegram-bot/` (auto-descubre `worker.test.mjs`)
+Run: `node --test telegram-bot/worker.test.mjs`
 Expected: 7 tests PASS
 
 - [ ] **Step 5: Commit**
@@ -310,7 +310,7 @@ test("contarPorTipo agrupa por el select Tipo", () => {
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `node --test telegram-bot/` (auto-descubre `worker.test.mjs`)
+Run: `node --test telegram-bot/worker.test.mjs`
 Expected: los 2 nuevos FAIL (export inexistente); los 7 previos PASS
 
 - [ ] **Step 3: Implementar integraciones (reemplazar stubs en worker.js)**
@@ -407,7 +407,7 @@ Y en `export default fetch`, ANTES del bloque `/webhook`, agregar la ruta de set
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `node --test telegram-bot/` (auto-descubre `worker.test.mjs`)
+Run: `node --test telegram-bot/worker.test.mjs`
 Expected: 9 tests PASS
 
 - [ ] **Step 5: README de setup (≤10 min de Isaac)**
