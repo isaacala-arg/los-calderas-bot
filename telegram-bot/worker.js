@@ -24,15 +24,23 @@ export function detectarIntent(texto) {
   if (t.startsWith("canci") || t.startsWith("cancion") || t.includes("canción del día") || t.includes("cancion del dia") || t.startsWith("rola"))
     return { tipo: "cancion", arg: texto.split(":").slice(1).join(":").trim() };
   if (t.includes("que subo") || t.includes("qué subo")) return { tipo: "que_subo", arg: "" };
-  if (/(guion|guión)/.test(t) && /(sobre|de |del )/.test(t)) return { tipo: "guion", arg: extraerTema(texto) };
+  const pideGuion =
+    /^\s*(guion|guión)\s+(sobre|de|del)\s+\S/.test(t) ||
+    /(hazme|genera|genérame|crea|créame|quiero)\s+(un\s+)?(guion|guión)/.test(t);
+  if (pideGuion) return { tipo: "guion", arg: extraerTema(texto) };
   if (t.includes("historia") || t.includes("encuesta")) return { tipo: "historia", arg: texto };
   return { tipo: "chat", arg: texto };
 }
 
 export function extraerTema(texto) {
-  return (texto || "")
-    .replace(/^.*?(guion|guión)\s*(sobre|de|del)\s+/i, "")
-    .trim();
+  const t = (texto || "").trim();
+  // Patrón 1: "guion sobre/de/del <tema>"
+  const m1 = t.match(/(?:guion|guión)\s+(?:sobre|de|del)\s+(\S.*)/i);
+  if (m1) return m1[1].trim();
+  // Patrón 2: "hazme/genera/... (un) guion (sobre/de/del <tema>)"
+  const m2 = t.match(/(?:hazme|genera|genérame|crea|créame|quiero)\s+(?:un\s+)?(?:guion|guión)(?:\s+(?:sobre|de|del)\s+(\S.*))?/i);
+  if (m2) return (m2[1] || "").trim();
+  return "";
 }
 
 export function siguienteVariante(ultima, total) {

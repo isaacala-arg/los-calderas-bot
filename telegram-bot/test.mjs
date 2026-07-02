@@ -53,3 +53,15 @@ test("formatearCancion con y sin canción", () => {
   );
   assert.ok(formatearCancion("").includes("¿cuál canción?"));
 });
+
+test("detectarIntent: mencionar 'guion de' conversacional NO dispara guion", () => {
+  assert.equal(detectarIntent("el guion de ayer me quedó bien").tipo, "chat");
+  assert.equal(detectarIntent("necesito feedback del guion de la semana pasada").tipo, "chat");
+});
+
+test("detectarIntent: formas explícitas SÍ disparan guion con tema", () => {
+  assert.deepEqual(detectarIntent("guion sobre el nuevo BYD"), { tipo: "guion", arg: "el nuevo BYD" });
+  assert.equal(detectarIntent("hazme un guión de los aranceles").tipo, "guion");
+  assert.equal(detectarIntent("quiero un guion sobre el FSD en CDMX").tipo, "guion");
+  assert.equal(detectarIntent("hazme un guion").arg, "");
+});
