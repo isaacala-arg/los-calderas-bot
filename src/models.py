@@ -37,3 +37,12 @@ class Script:
     hashtags_reels: list        # list[str]
     hashtags_shorts: list       # list[str]
     script_type: str            # "trend" | "howto" | "lifestyle" | "opinion" | "tech" | "fsd"
+
+
+@dataclass
+class Carousel:
+    title: str
+    slides: list        # list[dict] — {"titulo": str, "bullets": list[str]}
+    caption: str
+    hashtags: list      # list[str]
+    carousel_type: str  # "semana_tech" | "tema"
