@@ -42,3 +42,17 @@ def test_carousel_tema_toma_del_banco(mocker):
     c = cg.generate_carousel_tema()
     assert c.carousel_type == "tema"
     assert len(cg.CAROUSEL_TOPICS) >= 4
+
+
+def test_semana_tech_inmune_a_llaves_en_voice_guide(mocker):
+    """Regresión: si voice_guide contiene {llaves}, NO debe lanzar KeyError."""
+    mocker.patch(
+        "src.brain.carousel_generator._load_voice_guide",
+        return_value="guia con {llaves} y {script_type} raros",
+    )
+    mock = _mock_heavy(mocker)
+    # No debe tronar
+    cg.generate_semana_tech()
+    prompt = mock.call_args[0][0]
+    # El literal debe llegar intacto al LLM
+    assert "{llaves}" in prompt

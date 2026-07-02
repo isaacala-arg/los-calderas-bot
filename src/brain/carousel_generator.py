@@ -7,25 +7,20 @@ from src.models import Carousel
 
 _JSON_SCHEMA = """
 Responde SOLO con JSON válido (sin markdown, sin ```):
-{{
+{
   "title": "título del carrusel (sin el prefijo 'Carrusel:')",
   "slides": [
-    {{"titulo": "texto grande del slide", "bullets": ["bullet corto 1", "bullet corto 2"]}}
+    {"titulo": "texto grande del slide", "bullets": ["bullet corto 1", "bullet corto 2"]}
   ],
   "caption": "caption para el post (1-2 líneas, tono de Isaac)",
   "hashtags": ["5 hashtags"]
-}}
+}
 Reglas de slides: 6 a 8 slides. Slide 1 = portada con gancho (bullets vacíos).
 Último slide = cierre con continuidad implícita (nunca 'sígueme' literal).
 Bullets de máximo 12 palabras — es para leerse en un carrusel, no un ensayo.
 """
 
-_SEMANA_TECH_PROMPT = """{voice_guide}
-
----
-{contexto}
-
-Genera el carrusel semanal "Semana en tech: lo que pasó y por qué importa" para Los Calderas.
+_SEMANA_TECH_CUERPO = """Genera el carrusel semanal "Semana en tech: lo que pasó y por qué importa" para Los Calderas.
 
 BUSCA EN LA WEB las 4-5 noticias de tecnología MÁS relevantes de los últimos 7 días
 (prioriza: IA, autos eléctricos/tech automotriz, ciberseguridad, gadgets con impacto en México).
@@ -37,14 +32,7 @@ bullets = ["qué pasó en 1 línea", "por qué te importa a ti en México"].
 Es una SERIE SEMANAL: el cierre deja la expectativa de la próxima entrega sin decir "sígueme".
 """ + _JSON_SCHEMA
 
-_TEMA_PROMPT = """{voice_guide}
-
----
-{contexto}
-
-Genera un carrusel para Los Calderas sobre este tema:
-TEMA: {title}
-CONTEXTO: {context}
+_TEMA_CUERPO = """Genera un carrusel para Los Calderas sobre el tema indicado.
 
 Enseña algo útil con la voz de Isaac (analogías cotidianas, humor, cero humo).
 Todo dato debe ser real y verificable; si algo no se puede verificar, márcalo "DATO NO VERIFICADO".
@@ -86,18 +74,14 @@ def _parse(response, carousel_type: str) -> Carousel:
 
 
 def generate_semana_tech() -> Carousel:
-    prompt = _SEMANA_TECH_PROMPT.format(
-        voice_guide=_load_voice_guide(), contexto=_load_contexto_actual()
-    )
+    prompt = f"{_load_voice_guide()}\n\n---\n{_load_contexto_actual()}\n\n{_SEMANA_TECH_CUERPO}"
     response = llm_client.heavy(prompt, search=True)
     return _parse(response, "semana_tech")
 
 
 def generate_carousel_tema(topic: dict | None = None) -> Carousel:
     topic = topic or random.choice(CAROUSEL_TOPICS)
-    prompt = _TEMA_PROMPT.format(
-        voice_guide=_load_voice_guide(), contexto=_load_contexto_actual(),
-        title=topic["title"], context=topic["context"],
-    )
+    tema_header = f"TEMA: {topic['title']}\nCONTEXTO: {topic['context']}\n\n"
+    prompt = f"{_load_voice_guide()}\n\n---\n{_load_contexto_actual()}\n\n{tema_header}{_TEMA_CUERPO}"
     response = llm_client.heavy(prompt, search=True)
     return _parse(response, "tema")
