@@ -43,6 +43,33 @@ def write_script(script: Script) -> str:
     return response["url"]
 
 
+def write_news(article, reasoning: str) -> str:
+    """Guarda una noticia notable en Notion (Tipo='noticia') para que Isaac
+    la vea y decida convertirla en contenido. El monitor la usa en vez de email."""
+    from src.config import settings
+    notion = _get_notion()
+    response = notion.pages.create(
+        parent={"database_id": settings.NOTION_DATABASE_ID},
+        properties={
+            "Título": {"title": [{"text": {"content": f"📰 {article.title}"[:200]}}]},
+            "Tipo": {"select": {"name": "noticia"}},
+            "Estado": {"select": {"name": "Pendiente"}},
+            "Fecha": {"date": {"start": datetime.now(timezone.utc).strftime("%Y-%m-%d")}},
+        },
+        children=[
+            _h2("Por qué es contenido"),
+            _p(reasoning),
+            _h2("Fuente"),
+            _p(str(getattr(article, "source", ""))),
+            _p(str(getattr(article, "url", ""))),
+            _h2("Idea"),
+            _p("Si te late, pídele el guión al bot: escríbele en Telegram \"guion sobre "
+               + str(getattr(article, "title", "")) + "\" o córrelo desde Tema Personalizado."),
+        ],
+    )
+    return response["url"]
+
+
 def write_carousel(carousel: Carousel) -> str:
     from src.config import settings
     notion = _get_notion()

@@ -3,12 +3,16 @@ import feedparser
 from datetime import datetime, timezone
 from src.models import Article
 
+# Fuentes en español, enfocadas en México + tecnología (verificadas 2026-07).
+# El canal es carros + tech y prioriza México, así que las fuentes también.
 RSS_FEEDS = [
-    ("Motor Trend", "https://www.motortrend.com/rss/"),
-    ("Electrek", "https://electrek.co/feed/"),
-    ("The Drive", "https://www.thedrive.com/feed"),
-    ("Car and Driver", "https://www.caranddriver.com/rss/"),
-    ("Top Gear", "https://www.topgear.com/rss.xml"),
+    ("Motorpasión México", "https://feeds.weblogssl.com/motorpasionmx"),  # carros MX
+    ("Xataka", "https://feeds.weblogssl.com/xataka2"),                     # tech en español
+    ("Unocero", "https://www.unocero.com/feed/"),                          # tech MX
+    ("Hipertextual", "https://hipertextual.com/feed"),                     # tech LATAM/ES
+    ("Wired en Español", "https://es.wired.com/feed/rss"),                 # tech en español
+    ("Electrek", "https://electrek.co/feed/"),                             # autos eléctricos
+    ("The Verge", "https://www.theverge.com/rss/index.xml"),               # tech global fuerte
 ]
 
 _TAG_RE = re.compile(r"<[^>]+>")

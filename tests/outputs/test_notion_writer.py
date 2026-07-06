@@ -62,3 +62,29 @@ def test_write_carousel_crea_pagina_ordenada(mocker):
     assert "Slide 1" in contenido and "Slide 2" in contenido
     assert "por qué te importa" in contenido
     assert "Fuente: Reuters — 2026-07-01" in contenido
+
+
+def test_write_news_crea_pagina_tipo_noticia(mocker):
+    from src.models import Article
+    from datetime import datetime, timezone
+    mock_notion = MagicMock()
+    mock_notion.pages.create.return_value = {"url": "https://notion.so/news1"}
+    nw._notion = mock_notion
+
+    art = Article(
+        title="México lanza IA para el campo llamada Agrómeda",
+        url="https://unocero.com/agromeda",
+        summary="...",
+        source="Unocero",
+        published=datetime.now(timezone.utc),
+    )
+    url = nw.write_news(art, "IA mexicana, cruce perfecto tech + México para un reel")
+
+    assert url == "https://notion.so/news1"
+    kwargs = mock_notion.pages.create.call_args[1]
+    assert kwargs["properties"]["Tipo"]["select"]["name"] == "noticia"
+    assert kwargs["properties"]["Estado"]["select"]["name"] == "Pendiente"
+    titulo = kwargs["properties"]["Título"]["title"][0]["text"]["content"]
+    assert "Agrómeda" in titulo
+    contenido = str(kwargs["children"])
+    assert "Unocero" in contenido and "agromeda" in contenido

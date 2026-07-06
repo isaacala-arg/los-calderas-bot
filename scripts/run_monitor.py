@@ -8,6 +8,10 @@ from src.sources.rss_fetcher import fetch_articles
 from src.sources.reddit_fetcher import fetch_posts
 from src.brain.evaluator import evaluate
 from src.outputs.email_alerter import send_alert
+from src.outputs.notion_writer import write_news
+
+# Umbral para guardar una noticia en Notion. 6+ = notable/útil para contenido.
+NOTICIA_THRESHOLD = 6.0
 
 SEEN_URLS_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -54,12 +58,21 @@ def main():
             seen.add(a.url)
             seen_list.append(a.url)
 
-    if result.urgency_score >= 7 and result.urgent_article:
-        article = result.urgent_article
-        send_alert(article, result.urgency_score, result.urgency_reasoning)
-        print(f"Alert sent: {article.title}")
+    # Salida PRINCIPAL: guardar la mejor noticia notable en Notion (donde Isaac
+    # trabaja y el workflow SÍ tiene credenciales). El email quedó como bonus
+    # opcional — antes era la única salida y nunca estaba configurado.
+    top = result.urgent_article or (result.top_articles[0] if result.top_articles else None)
+    if top and result.urgency_score >= NOTICIA_THRESHOLD:
+        try:
+            url = write_news(top, result.urgency_reasoning)
+            print(f"Noticia guardada en Notion ({result.urgency_score}/10): {top.title} -> {url}")
+        except Exception as e:
+            print(f"No se pudo guardar la noticia en Notion: {e}")
+        # Bonus: si está muy urgente Y el email está configurado, además avisa por correo.
+        if result.urgency_score >= 8 and result.urgent_article:
+            send_alert(result.urgent_article, result.urgency_score, result.urgency_reasoning)
     else:
-        print(f"No urgent news. Urgency score: {result.urgency_score}/10")
+        print(f"Sin noticias notables esta corrida. Score: {result.urgency_score}/10")
 
     save_seen_urls(seen_list)
 

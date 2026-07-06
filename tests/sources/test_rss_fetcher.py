@@ -17,7 +17,7 @@ def test_returns_articles_from_feeds(mocker):
 
     assert len(articles) > 0
     assert articles[0].title == "Tesla anuncia Model Y actualizado para México"
-    assert articles[0].source == "Motor Trend"
+    assert articles[0].source == "Motorpasión México"
 
 
 def test_truncates_summary_to_500_chars(mocker):
