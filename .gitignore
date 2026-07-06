@@ -10,3 +10,6 @@ venv/
 
 # Scratch interno de sesiones de desarrollo (ledger/briefs/diffs)
 .superpowers/
+
+# Cache local de wrangler (Cloudflare)
+.wrangler/
