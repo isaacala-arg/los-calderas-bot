@@ -4,7 +4,7 @@ compatibility_date = "2026-06-01"
 
 [[kv_namespaces]]
 binding = "ESTADO"
-id = "REEMPLAZAR_CON_ID_DE_KV"   # se crea con: npx wrangler kv namespace create ESTADO
+id = "e52f3a1e9fcf4bd5b59ec380b8f8793e"
 
 [vars]
 LLM_PROVIDER = "gemini"

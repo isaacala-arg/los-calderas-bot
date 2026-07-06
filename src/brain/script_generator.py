@@ -256,8 +256,15 @@ def build_canal_context(recent_titles: list[str], approved_examples: list[dict])
     if recent_titles:
         titles_text = "\n".join(f"- {t}" for t in recent_titles)
         parts.append(
-            "TEMAS RECIENTES EN EL CANAL — NO repitas exactamente estos temas. "
-            "Si el tema es similar, busca un ángulo completamente distinto:\n" + titles_text
+            "TEMAS YA HECHOS EN EL CANAL (últimas semanas) — REGLA DURA de no repetición:\n"
+            + titles_text
+            + "\n\nProhibido repetir no solo el título, sino el MISMO SUJETO, el MISMO CHISTE o el "
+            "MISMO ÁNGULO de cualquiera de estos, aunque cambies de pilar (tech/opinion/etc.) o le "
+            "cambies dos palabras. Ejemplos de lo que NO debes volver a hacer si ya salió: "
+            "'el FSD es un becario', 'el costo real de mi Swift', 'el truco/problema de los carros "
+            "chinos'. Si tu tema semilla cae en un sujeto que YA está en esta lista, cámbialo por uno "
+            "genuinamente nuevo o dale un giro tan distinto que no se sienta el mismo video. Ante la "
+            "duda, elige otro sujeto."
         )
 
     recent_hooks = [ex.get("hook", "").lower() for ex in approved_examples if ex.get("hook")]

@@ -59,6 +59,32 @@ def test_parse_incluye_fuente(mocker):
     assert c.slides[0]["fuente"] == ""  # portada sin fuente
 
 
+def test_prompt_incluye_estrategia_de_carrusel(mocker):
+    mock = _mock_heavy(mocker)
+    cg.generate_semana_tech()
+    prompt = mock.call_args[0][0]
+    assert "DETENER EL SCROLL" in prompt          # misión de la portada
+    assert "MÁXIMO 8 palabras" in prompt           # límite de portada
+    assert "CONFIRMA EL GANCHO" in prompt          # slide 2
+    assert "GUARDAR" in prompt.upper()             # slide guardable
+    assert "screenshot suelto" in prompt           # standalone
+
+
+def test_carrusel_respeta_temas_recientes(mocker):
+    mock = _mock_heavy(mocker)
+    cg.generate_semana_tech(recent_titles=["El FSD de Tesla es un Becario", "Costo real de mi Swift"])
+    prompt = mock.call_args[0][0]
+    assert "TEMAS YA HECHOS EN EL CANAL" in prompt
+    assert "El FSD de Tesla es un Becario" in prompt
+
+
+def test_carrusel_tema_pasa_recientes(mocker):
+    mock = _mock_heavy(mocker)
+    cg.generate_carousel_tema(recent_titles=["Glosario de ciberseguridad"])
+    prompt = mock.call_args[0][0]
+    assert "Glosario de ciberseguridad" in prompt
+
+
 def test_carousel_tema_toma_del_banco(mocker):
     _mock_heavy(mocker)
     c = cg.generate_carousel_tema()

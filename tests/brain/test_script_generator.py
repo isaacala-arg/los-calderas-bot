@@ -104,6 +104,13 @@ def test_generate_evergreen_returns_script(mocker, tmp_path):
     assert script.hook != ""
 
 
+def test_canal_context_anti_repeticion_es_dura():
+    ctx = sg.build_canal_context(["El FSD de Tesla es un Becario"], [])
+    assert "El FSD de Tesla es un Becario" in ctx
+    assert "MISMO SUJETO" in ctx and "MISMO CHISTE" in ctx
+    assert "aunque cambies de pilar" in ctx
+
+
 def test_append_avoid_hooks_adds_block():
     out = sg.append_avoid_hooks("BASE", ["Gancho uno", "Gancho dos"])
     assert "BASE" in out

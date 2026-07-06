@@ -6,6 +6,21 @@ from src.brain import llm_client
 from src.brain.script_generator import _load_voice_guide, _load_contexto_actual
 from src.models import Carousel
 
+# Estrategia de carrusel (reglas de retención que Isaac quiere que el bot respete).
+_CARRUSEL_ESTRATEGIA = """
+ESTRATEGIA DE CARRUSEL (obligatoria — así se retiene y se guarda):
+1. LA PORTADA (slide 1) TIENE UNA SOLA MISIÓN: DETENER EL SCROLL. No expliques el tema, no te
+   presentes. Una promesa o un número, fuente grande, alto contraste. MÁXIMO 8 palabras — si
+   necesita más, ya los perdiste.
+2. EL SLIDE 2 CONFIRMA EL GANCHO O SE VAN. Plantea el problema y sus consecuencias; que quien
+   llegue piense de inmediato "esto vale mi tiempo".
+3. CADA SLIDE DEBE FUNCIONAR SOLO, como screenshot suelto sin contexto. Una sola idea por slide.
+4. AL MENOS UN SLIDE DEBE VALER LA PENA GUARDAR/COMPARTIR por sí solo: un marco, un checklist, o
+   una frase tan afilada que la citen en sus stories. Ese slide convierte alcance en guardados.
+5. Consistencia visual: piensa cada slide para máximo dos tipografías y alto contraste; nada de
+   saturar. Tú entregas la ARQUITECTURA (qué dice cada slide); el impacto lo pule Isaac.
+"""
+
 _JSON_SCHEMA = """
 Responde SOLO con JSON válido (sin markdown, sin ```):
 {
@@ -16,7 +31,8 @@ Responde SOLO con JSON válido (sin markdown, sin ```):
   "caption": "caption para el post (1-2 líneas, tono de Isaac)",
   "hashtags": ["5 hashtags"]
 }
-Reglas de slides: 6 a 8 slides. Slide 1 = portada con gancho (bullets vacíos, sin fuente).
+Reglas de slides: 6 a 8 slides. Slide 1 = PORTADA que detiene el scroll (máx 8 palabras, bullets
+vacíos, sin fuente). Slide 2 confirma el gancho. Marca cuál es el slide GUARDABLE.
 Último slide = cierre con continuidad implícita (nunca 'sígueme' literal), sin fuente.
 Bullets de máximo 12 palabras — es para leerse en un carrusel, no un ensayo.
 """
@@ -96,7 +112,19 @@ def _parse(response, carousel_type: str) -> Carousel:
     )
 
 
-def generate_semana_tech() -> Carousel:
+def _anti_repeticion(recent_titles: list | None) -> str:
+    """Bloque para que el carrusel no repita temas ya hechos en el canal."""
+    titles = [t for t in (recent_titles or []) if t]
+    if not titles:
+        return ""
+    lista = "\n".join(f"- {t}" for t in titles)
+    return (
+        "TEMAS YA HECHOS EN EL CANAL — no repitas el mismo sujeto, chiste ni ángulo de estos, "
+        "aunque cambies dos palabras:\n" + lista + "\n\n"
+    )
+
+
+def generate_semana_tech(recent_titles: list | None = None) -> Carousel:
     # La ventana de fechas va explícita: el modelo no sabe qué día es hoy,
     # y sin esto acepta noticias viejas recirculadas (feedback de Isaac).
     hoy = date.today()
@@ -106,14 +134,20 @@ def generate_semana_tech() -> Carousel:
         f"del {desde.isoformat()} al {hoy.isoformat()} (últimos 7 días). "
         f"Cualquier noticia publicada antes del {desde.isoformat()} está PROHIBIDA.\n\n"
     )
-    prompt = f"{_load_voice_guide()}\n\n---\n{_load_contexto_actual()}\n\n{ventana}{_SEMANA_TECH_CUERPO}"
+    prompt = (
+        f"{_load_voice_guide()}\n\n---\n{_load_contexto_actual()}\n\n{_CARRUSEL_ESTRATEGIA}\n\n"
+        f"{_anti_repeticion(recent_titles)}{ventana}{_SEMANA_TECH_CUERPO}"
+    )
     response = llm_client.heavy(prompt, search=True)
     return _parse(response, "semana_tech")
 
 
-def generate_carousel_tema(topic: dict | None = None) -> Carousel:
+def generate_carousel_tema(topic: dict | None = None, recent_titles: list | None = None) -> Carousel:
     topic = topic or random.choice(CAROUSEL_TOPICS)
     tema_header = f"TEMA: {topic['title']}\nCONTEXTO: {topic['context']}\n\n"
-    prompt = f"{_load_voice_guide()}\n\n---\n{_load_contexto_actual()}\n\n{tema_header}{_TEMA_CUERPO}"
+    prompt = (
+        f"{_load_voice_guide()}\n\n---\n{_load_contexto_actual()}\n\n{_CARRUSEL_ESTRATEGIA}\n\n"
+        f"{_anti_repeticion(recent_titles)}{tema_header}{_TEMA_CUERPO}"
+    )
     response = llm_client.heavy(prompt, search=True)
     return _parse(response, "tema")
