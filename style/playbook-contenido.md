@@ -168,3 +168,21 @@ Estructura: 6–8 slides. Slide 1 = portada. Último = cierre con continuidad im
 - **Remate:** casi siempre cierras con una frase corta e irónica ("hola enganche de tu nuevo Olinia", "no respeta a nadie").
 - **CTA recurrente:** "Guarda esto para…" — utilidad, no venta.
 - **Referencias tuyas:** el Caldermóvil, el Swift, comparaciones de becario/realidad.
+
+---
+
+## 14. Crecimiento y conversión (datos reales de @isaaccola_, 6-jul-2026)
+
+> ⚠️ n=5 posts, 134 seguidores. Son **hipótesis a validar**, no leyes. No auto-optimizar por tema/formato hasta tener ~15-20 posts. Por ahora: reportar métricas y decidir a mano.
+
+**El hallazgo clave: reach ≠ conversión.**
+- El reel viral de tech (Tesla FSD) alcanzó **1,171 cuentas (94% no seguidores)** pero trajo **0 visitas a perfil y 0 seguidores**. Se consume y se va.
+- El carrusel de utilidad ("5 tips de becario") alcanzó **5x menos**, pero fue el **único que trajo un seguidor** (9 visitas a perfil).
+- Guardados/compartidos en general: 0-2 por post. Casi nada da "razón para volver".
+
+**Qué hacer:**
+1. **Favorece la utilidad para convertir**, sin soltar el tech para el alcance. Los formatos howto/tips cierran invitando a **explorar el perfil o guardar**, no solo continuidad.
+2. **Cada pieza de tech/carros necesita un elemento GUARDABLE** (dato duro, comparación, tip aplicable) — hoy trae alcance pero 0 guardados.
+3. **Publica entre 12h y 18h (pico 6pm)** — cuando tu audiencia está activa. Recalcular al crecer.
+4. **Separa reach de conversión al medir.** Guarda por post: reach, visitas a perfil, seguidores nuevos. La métrica que importa es la conversión, no las views.
+5. **Salvaguarda:** con n=5 no hay causalidad. El bot solo reporta; Isaac decide, hasta ~15-20 posts.

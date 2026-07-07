@@ -95,11 +95,15 @@ _TYPE_GUIDANCE = {
     "trend": (
         "TIPO: NOTICIAS / TENDENCIAS. Reacciona a una noticia real de carros o tecnología con la "
         "perspectiva de Isaac (ingeniero, usuario real). Datos concretos traducidos a lo cotidiano. "
-        "Gancho que te mete en la situación, no que la anuncia. Si puedes, verifica datos con búsqueda."
+        "Gancho que te mete en la situación, no que la anuncia. Si puedes, verifica datos con búsqueda. "
+        "CONVERSIÓN: el tech trae alcance pero se consume y se va; incluye SÍ o SÍ un elemento GUARDABLE "
+        "(un dato duro, una comparación o un tip aplicable) que le dé al espectador razón para volver."
     ),
     "howto": (
         "TIPO: HOW-TO / DATOS REALES. Resuelve una duda real con cifras concretas. Revela el dato o "
-        "número AL INICIO (anti-suspenso). Estructura estilo Cristian: la duda real → cómo funciona simple → qué significa para ti."
+        "número AL INICIO (anti-suspenso). Estructura estilo Cristian: la duda real → cómo funciona simple → qué significa para ti. "
+        "CONVERSIÓN: este formato de utilidad es el que mejor convierte a seguidor; el CTA puede invitar a "
+        "explorar el perfil o guardar el post (donde hay más como este), no solo la continuidad genérica."
     ),
     "lifestyle": (
         "TIPO: LIFESTYLE BECARIO. Un pedazo real de la vida de Isaac (home office, gym, manejar el Swift, "
@@ -112,7 +116,8 @@ _TYPE_GUIDANCE = {
     "tech": (
         "TIPO: TECNOLOGÍA. Isaac es ingeniero/ciberseguridad: enseña algo de tech útil (usar Claude/IA, "
         "una app, un truco, seguridad básica) con autoridad real y sin tecnicismos. Si puedes, mete el puente con "
-        "los carros (p.ej. lo enseña mientras el Tesla maneja con FSD). Termina con un remate seco."
+        "los carros (p.ej. lo enseña mientras el Tesla maneja con FSD). Termina con un remate seco. "
+        "CONVERSIÓN: incluye un elemento GUARDABLE (un truco, un dato o un tip aplicable) — que no solo se vea, que se guarde."
     ),
     "fsd": (
         "TIPO: FSD + LISTICLE/STORYTELLING. El Tesla (Caldermóvil) maneja solo con FSD mientras Isaac "

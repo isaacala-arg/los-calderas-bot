@@ -88,3 +88,13 @@ def test_write_news_crea_pagina_tipo_noticia(mocker):
     assert "Agrómeda" in titulo
     contenido = str(kwargs["children"])
     assert "Unocero" in contenido and "agromeda" in contenido
+
+
+def test_write_script_incluye_horario_de_publicacion(mocker):
+    mock_notion = MagicMock()
+    mock_notion.pages.create.return_value = {"url": "https://notion.so/p"}
+    nw._notion = mock_notion
+    nw.write_script(_make_script())
+    contenido = str(mock_notion.pages.create.call_args[1]["children"])
+    assert "Cuándo publicar" in contenido
+    assert "18h" in contenido

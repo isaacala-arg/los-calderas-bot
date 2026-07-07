@@ -38,6 +38,9 @@ def write_script(script: Script) -> str:
             _p(f"TikTok: {' '.join(script.hashtags_tiktok)}"),
             _p(f"Reels: {' '.join(script.hashtags_reels)}"),
             _p(f"Shorts: {' '.join(script.hashtags_shorts)}"),
+            _h2("📅 Cuándo publicar"),
+            _p("Mejor entre 12h y 18h (pico 6pm), que es cuando tu audiencia está más activa "
+               "(dato de tus Insights, 134 seguidores — recalcular cuando crezcas)."),
         ],
     )
     return response["url"]

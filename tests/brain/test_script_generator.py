@@ -183,3 +183,15 @@ def test_contexto_actual_injected_into_prompt(mocker, tmp_path):
     sg.generate_howto()
     prompt = mock.models.generate_content.call_args[1]["contents"]
     assert "VACACIONES hasta el 15 de agosto" in prompt
+
+
+def test_trend_y_tech_exigen_elemento_guardable(mocker, tmp_path):
+    _patch_client(mocker, tmp_path, "trend")
+    assert "GUARDABLE" in sg._build_prompt("trend", "t", "c", "")
+    assert "GUARDABLE" in sg._build_prompt("tech", "t", "c", "")
+
+
+def test_howto_cta_a_perfil(mocker, tmp_path):
+    _patch_client(mocker, tmp_path, "howto")
+    p = sg._build_prompt("howto", "t", "c", "")
+    assert "explorar el perfil" in p
